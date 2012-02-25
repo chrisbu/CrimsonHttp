@@ -1,8 +1,7 @@
-#library("crimson");
+#library("crimson:core");
 
 #import("lib/http.dart");
 #import("dart:io");
-#import("dart:coreimpl");
 #source('crimson_impl.dart');
 
 
@@ -62,7 +61,7 @@ interface CrimsonHttpServer default _CrimsonHttpServer {
 /// Contains a list of [CrimsonHandler].  Is used by [CrimsonHttpServer] to
 /// contain the list of filters and endpoints
 interface CrimsonHandlerList<E extends CrimsonHandler> 
-                   extends List<CrimsonHandler> 
+                   extends Iterable<E> 
                    default _CrimsonHandlerList {
   
   ///default constructor
@@ -88,6 +87,17 @@ interface CrimsonHandler {
   /// If the result is TRUE, then no further handlers will be processed, and 
   /// [response.writeDone()] will be called. 
   bool handle(HTTPRequest request, HTTPResponse response);  
+  
+  /// The [name] by which we can identify the handler.  This is used in logging.
+  /// It should be set as a constant value in any implementations.
+  String get NAME();
+  
+  /// The [logLevel] to which the handler will output to the standard crimson
+  /// logger.  
+  /// For example, if the logLevel is Logger.DEBUG, then all debug and above
+  /// messages will be shown for this handler.
+  int logLevel;
+  
 }
 
 
