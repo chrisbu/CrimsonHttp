@@ -41,7 +41,8 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
   /// The loops need to be able to run async, and as such, each of the handle
   /// calls need to call next(); 
   _onRequestHandler(HTTPRequest req, HTTPResponse res) {
-    print("onRequestHandler");
+    logger.info("${req.method}: ${req.uri}");
+    
     Iterator filterIterator = filters.iterator();
     Filter filter = null;
     

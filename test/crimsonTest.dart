@@ -6,6 +6,7 @@
 ///Simple test server
 main() {
   CrimsonHttpServer server = new CrimsonHttpServer();
+  server.logger = new SimpleLogger(CrimsonLogger.INFO);
   
 //  server.filters.add(new Logger(Logger.INFO));
 //  server.filters.add(handler)
