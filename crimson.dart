@@ -150,12 +150,13 @@ interface CrimsonLogger {
 /// Exception handler which takes the [status] and the [message]
 class CrimsonHttpException implements HTTPException {
   
-  CrimsonHttpException(this.status, this.message);
+  CrimsonHttpException(this.status, this.message, [this.stack=null]);
   
   final int status;
   final String message;
+  final String stack;
   
   toString() {
-    return "${status}: ${message}"; 
+    return stack == null ? "${status}: ${message}" : "${status}: ${message}\n${stack}";    
   }
 }

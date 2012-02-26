@@ -61,6 +61,8 @@ class Favicon implements CrimsonEndpoint {
     file.exists();
   }
   
+  
+  
   final String NAME = "FAVICON";
   
 }

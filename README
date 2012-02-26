@@ -1,0 +1,7 @@
+CrimsonHttp server for Dart
+----------
+
+Currently uses the chat sample http server, but will be ported to the 
+dart:io http server once that is released
+
+Loosely inspired upon sencha/connect for node.js

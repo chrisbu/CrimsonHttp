@@ -43,15 +43,17 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
   _onRequestHandler(HTTPRequest req, HTTPResponse res) {
     logger.info("${req.method}: ${req.uri}");
     
-    _processFilters(req,res);
-    _processHandlers(req,res);
+    _processFilters(req,res,onAllComplete() {
+      _processHandlers(req,res);  
+    });
+    
     
     
   }
   
   /// Process all the [filters] in the list.
   /// If a filter generates an error, then it is logged, but we still contiune.
-  _processFilters(HTTPRequest req, HTTPResponse res) {
+  _processFilters(HTTPRequest req, HTTPResponse res, void onAllComplete()) {
     Iterator filterIterator = filters.iterator();
     CrimsonFilter filter = null;
     
@@ -64,7 +66,17 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
       
       if (filterIterator.hasNext()) {
         filter = filterIterator.next();
-        filter.handle(req, res, this, ([error]) => next());
+        try {
+          filter.handle(req, res, this, next([error]) => next(error));
+        }
+        catch (Exception ex, var stack){
+          //call next, passing in the exception details so that we can log it.
+          next("${ex}: ${stack}");
+        } 
+      }
+      else {
+        //call the onAllComplete handler when we've processed all the filters
+        onAllComplete();
       }
       
     }
@@ -85,18 +97,23 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
       if (error != null) {
         //if there is an error, then END (no more recursing - note the else...
         logger.error(error);
-        _errorHandler(new CrimsonHttpException(HTTPStatus.INTERNAL_SERVER_ERROR, error));
+        _errorHandler(error,req,res);
       }
       else if (endpointIterator.hasNext()) {
         endpoint = endpointIterator.next();
         //call the handler, passing in this function to allow recursing.
-        endpoint.handle(req, res, this, 
-             ([CrimsonHttpException error = null]) => next(error), 
-             () => res.writeDone()); //second closure represents success
+        try {
+          endpoint.handle(req, res, this, 
+               ([CrimsonHttpException error = null]) => next(error), 
+               success() => res.writeDone()); //second closure represents success
+        }
+        catch (Exception ex, var stack) {
+          next(new CrimsonHttpException(HTTPStatus.INTERNAL_SERVER_ERROR, ex, stack));
+        }
       } else {
         //if we've got here, and there are no errors
         //then we've not found a matching endpoint, so return a 404 error.
-        _errorHandler(new CrimsonHttpException(HTTPStatus.NOT_FOUND, "Not found"), res);
+        _errorHandler(new CrimsonHttpException(HTTPStatus.NOT_FOUND, "Not found"), req, res);
       }
       
     }
@@ -105,11 +122,13 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
     next();
   }
   
-  _errorHandler(CrimsonHttpException error, HTTPResponse res) {
-    print("Default error handler: ${error}");
-    res.writeString(error.toString());
+  _errorHandler(CrimsonHttpException error, HTTPRequest req, HTTPResponse res) {
+    this.logger.error(error.toString());
     res.statusCode = error.status;
     res.setHeader("Content-Type", "text/plain");
+    res.writeString("CrimsonHttp: Error");
+    res.writeString(error.toString());
+    res.writeString("\nMethod: ${req.method}: ${req.uri}");
     res.writeDone();
     //TODO: If an error handler filter has been registered, then use that.
     //Might be better to have an errorHandler collection in the same
