@@ -3,6 +3,7 @@
 #import("lib/http.dart");
 #import("dart:io");
 #source('crimson_impl.dart');
+#source('crimson_utils.dart');
 
 
 /// Crimson is a set of HTTP middleware for Dart, loosely based upon 
@@ -94,7 +95,12 @@ interface CrimsonHandler {
   /// If [next] is not called, then no more handlers will be called, and the 
   /// response will be sent back to the client.  This is desirable for an
   /// endpoint which has not handled the request.
-  void handle(HTTPRequest request, HTTPResponse response, CrimsonHttpServer server, void next());  
+  /// optional [success] callback when a handler successfully handles 
+  /// the request.
+  void handle(HTTPRequest request, HTTPResponse response, 
+              CrimsonHttpServer server, 
+              void next([CrimsonHttpException error]), 
+              [void success()]);  
   
   /// The [name] by which we can identify the handler.  This is used in logging.
   /// It should be set as a constant value in any implementations.
@@ -141,6 +147,15 @@ interface CrimsonLogger {
   void error(String message);
 }
 
-class CrimsonException implements HTTPException {
+/// Exception handler which takes the [status] and the [message]
+class CrimsonHttpException implements HTTPException {
   
+  CrimsonHttpException(this.status, this.message);
+  
+  final int status;
+  final String message;
+  
+  toString() {
+    return "${status}: ${message}"; 
+  }
 }

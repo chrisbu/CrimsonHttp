@@ -46,7 +46,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
     _processFilters(req,res);
     _processHandlers(req,res);
     
-    res.writeDone();
+    
   }
   
   /// Process all the [filters] in the list.
@@ -58,6 +58,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
     //closure to allow chaining async handlers
     next([error]) {
       if (error != null) {
+        print("in filter error handler: ${error}");
         logger.error(error);  
       }
       
@@ -79,15 +80,23 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
     CrimsonEndpoint endpoint = null;
     
     //recursive closure to allow chaining async handlers
-    next([error]) {
+    next([CrimsonHttpException error = null]) {
+      
       if (error != null) {
-        //if there is an error, then END (no more recursing
-        logger.error(error);  
+        //if there is an error, then END (no more recursing - note the else...
+        logger.error(error);
+        _errorHandler(new CrimsonHttpException(HTTPStatus.INTERNAL_SERVER_ERROR, error));
       }
       else if (endpointIterator.hasNext()) {
         endpoint = endpointIterator.next();
         //call the handler, passing in this function to allow recursing.
-        endpoint.handle(req, res, this, ([error]) => next([error]));
+        endpoint.handle(req, res, this, 
+             ([CrimsonHttpException error = null]) => next(error), 
+             () => res.writeDone()); //second closure represents success
+      } else {
+        //if we've got here, and there are no errors
+        //then we've not found a matching endpoint, so return a 404 error.
+        _errorHandler(new CrimsonHttpException(HTTPStatus.NOT_FOUND, "Not found"), res);
       }
       
     }
@@ -96,8 +105,12 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
     next();
   }
   
-  _errorHandler(String err) {
-    print("Default error handler: ${err}");
+  _errorHandler(CrimsonHttpException error, HTTPResponse res) {
+    print("Default error handler: ${error}");
+    res.writeString(error.toString());
+    res.statusCode = error.status;
+    res.setHeader("Content-Type", "text/plain");
+    res.writeDone();
     //TODO: If an error handler filter has been registered, then use that.
     //Might be better to have an errorHandler collection in the same
     //way that we have filters and endpoints.
