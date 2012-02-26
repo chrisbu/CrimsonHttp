@@ -43,31 +43,57 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
   _onRequestHandler(HTTPRequest req, HTTPResponse res) {
     logger.info("${req.method}: ${req.uri}");
     
-    Iterator filterIterator = filters.iterator();
-    Filter filter = null;
-    
-    //closure to allow chaining async handlers
-    next() {
-      if (filterIterator.hasNext()) {
-        filter = filterIterator.next();
-        filter.handle(req, res, this, () => next());
-      }
-    }
-    
-    //start the chain running by calling next();
-    next();
-    
-   
+    _processFilters(req,res);
+    _processHandlers(req,res);
     
     res.writeDone();
   }
   
+  /// Process all the [filters] in the list.
+  /// If a filter generates an error, then it is logged, but we still contiune.
   _processFilters(HTTPRequest req, HTTPResponse res) {
+    Iterator filterIterator = filters.iterator();
+    CrimsonFilter filter = null;
     
+    //closure to allow chaining async handlers
+    next([error]) {
+      if (error != null) {
+        logger.error(error);  
+      }
+      
+      if (filterIterator.hasNext()) {
+        filter = filterIterator.next();
+        filter.handle(req, res, this, ([error]) => next());
+      }
+      
+    }
+    
+    //start the chain running by calling next();
+    next();
   }
   
+  /// Process all the [endpoints] in the list
+  /// If an endpoint generates and error, it is logged, and we fail with a 500 
   _processHandlers(HTTPRequest req, HTTPResponse res) {
+    Iterator endpointIterator = endpoints.iterator();
+    CrimsonEndpoint endpoint = null;
     
+    //recursive closure to allow chaining async handlers
+    next([error]) {
+      if (error != null) {
+        //if there is an error, then END (no more recursing
+        logger.error(error);  
+      }
+      else if (endpointIterator.hasNext()) {
+        endpoint = endpointIterator.next();
+        //call the handler, passing in this function to allow recursing.
+        endpoint.handle(req, res, this, ([error]) => next([error]));
+      }
+      
+    }
+    
+    //start the chain running by calling next();
+    next();
   }
   
   _errorHandler(String err) {

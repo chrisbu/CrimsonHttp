@@ -140,3 +140,7 @@ interface CrimsonLogger {
   void warn(String message); 
   void error(String message);
 }
+
+class CrimsonException implements HTTPException {
+  
+}
