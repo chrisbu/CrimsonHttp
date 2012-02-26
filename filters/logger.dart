@@ -1,34 +1,52 @@
 
-class Logger implements CrimsonFilter {
+/// Base logger which simply forwards the log messages
+/// to the log function.
+class BaseLogger implements CrimsonLogger {
   
-  final String NAME = "LOGGER";
+  void trace(String message) => log(message, TRACE);
+  void debug(String message) => log(message, DEBUG);
+  void info(String message) => log(message, INFO);
+  void warn(String message) => log(message, WARN);
+  void error(String message) => log(message, ERROR);
   
-  static final int TRACE = 0;
-  static final int DEBUG = 1;
-  static final int INFO = 2;
-  static final int WARN = 3;
-  static final int ERROR = 4;
-  
+}
+
+
+class SimpleLogger extends BaseLogger implements CrimsonLogger {
   /// The log level to log.
   int defaultLevel = ERROR; //the default level for all logging
   
-  int logLevel = WARN; //default level for this class is WARN
+  int logLevel = INFO; //default level for this class is WARN
   
-  Logger(this.defaultLevel, [this.logLevel]);
+  final String NAME = "LOGGER";
   
-  void _log(String message, int level) {
+  /// Constructor.  
+  /// [defaultLevel] defines the global log level for calls into this clase
+  /// Optional [logLevel] defines the log level for this class.  
+  SimpleLogger(this.defaultLevel, [this.logLevel = INFO]);
+  //TODO: This probably needs thinking about a bit more.
+  
+  /// [CrimsonHandler.handle] implementation
+  /// Provides INFO level logging of the [request.method] and [request.uri]
+  void handle(HTTPRequest request, response, server, next) {
+    //provide info logging of the request.
+    try {
+      info("${request.method}: ${request.uri}");
+    }
+    catch (var ex) {
+      print(ex);
+    }
+    finally {
+      next();  
+    }
+    
+  }
+  
+  void log(String message, int level) {
     if (level >= defaultLevel) {
-      print(message);  
+      print("${new Date.now()} - ${LEVEL_TEXT[level]} - ${message}");
     }
   }
   
-  void log(CrimsonHandler handler, String message) {
-    _log(message, handler.logLevel);
-  }
-  
-  bool handle(request, response) {
-    log(this, "Request received");
-    return false;
-  }
-
 }
+

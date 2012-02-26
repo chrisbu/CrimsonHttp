@@ -1,17 +1,22 @@
 
 class _CrimsonHttpServer implements CrimsonHttpServer {
+  /// Contains the complete list of filters which implement [CrimsonFilter]
   CrimsonHandlerList<CrimsonFilter> get filters() => _filters;
+  
+  /// Contains the complete list of handlers which implement [CrimsonEndpoint]
   CrimsonHandlerList<CrimsonEndpoint> get endpoints() => _endpoints;
   
-  CrimsonHandlerList<CrimsonFilter> _filters;
-  CrimsonHandlerList<CrimsonEndpoint> _endpoints;
+  /// Contains the logger (which will default to [_NullLogger] if not otherwise
+  /// defined
+  CrimsonLogger logger;
   
-  final HTTPServer _httpServer;
   
+  /// Constructor
   _CrimsonHttpServer([HTTPServer httpServer]) :
     //if the optional parameter hasn't been passed, then create
     //a new HTTPServer
-    _httpServer = httpServer == null ? new HTTPServer() : httpServer
+    _httpServer = httpServer == null ? new HTTPServer() : httpServer,
+    logger = new _NullLogger()
   {
     //would prefer to make these final, but we don't have access
     //to this at that point.
@@ -20,20 +25,48 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
     _httpServer.errorHandler = _errorHandler;
   }
   
-  ///Start listening on the [host] and [port] provided
+  /// Start listening on the [host] and [port] provided.
+  /// Calls the internal [_onRequestHandler] method when a request is received
+  /// which internall processes all the filters and tries to find an endpoint.
   listen(String host, int port) {
     _httpServer.listen(host, port, _onRequestHandler);
     print("Listening on ${host}:${port}");
   }
   
+  /// This is the core of method of [CrimsonHttpServer]
+  /// It first loops through each of the [filters] in turn, calling handle
+  /// on each, and then loops through each of the [endpoints] until an endpoint
+  /// has handled the request and populated the response.
+  /// ---
+  /// The loops need to be able to run async, and as such, each of the handle
+  /// calls need to call next(); 
   _onRequestHandler(HTTPRequest req, HTTPResponse res) {
     print("onRequestHandler");
-    for (CrimsonHandler handler in _filters) {
-      print("Handler " + handler.NAME);
-      handler.handle(req,res);
+    Iterator filterIterator = filters.iterator();
+    Filter filter = null;
+    
+    //closure to allow chaining async handlers
+    next() {
+      if (filterIterator.hasNext()) {
+        filter = filterIterator.next();
+        filter.handle(req, res, this, () => next());
+      }
     }
     
+    //start the chain running by calling next();
+    next();
+    
+   
+    
     res.writeDone();
+  }
+  
+  _processFilters(HTTPRequest req, HTTPResponse res) {
+    
+  }
+  
+  _processHandlers(HTTPRequest req, HTTPResponse res) {
+    
   }
   
   _errorHandler(String err) {
@@ -42,6 +75,11 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
     //Might be better to have an errorHandler collection in the same
     //way that we have filters and endpoints.
   }
+  
+  CrimsonHandlerList<CrimsonFilter> _filters;
+  CrimsonHandlerList<CrimsonEndpoint> _endpoints;
+  final HTTPServer _httpServer;
+  
 }
 
 
@@ -99,4 +137,18 @@ class _CrimsonHandlerList<E extends CrimsonHandler> implements CrimsonHandlerLis
 //  void setRange(int start, int l, List from, [int startFrom]) => _internalList.setRange(start, l, from, startFrom);
 //  void removeRange(int start, int l) => _internalList.removeRange(start, l);
 //  void insertRange(int start, int l, [CrimsonHandler initialValue]) => _internalList.insertRange(start, l, initialValue);
+}
+
+
+
+/// A defualt logger for [CrimsonHttpServer] to use
+/// sends log messages no-where.
+/// ensures that we don't end up with NPE when trying to log things.
+class _NullLogger implements CrimsonLogger {
+  void trace(String message) => null;
+  void debug(String message) => null;
+  void info(String message) => null;
+  void warn(String message) => null;
+  void error(String message) => null;
+  void log(String message, int level) => null;
 }

@@ -7,7 +7,7 @@
 main() {
   CrimsonHttpServer server = new CrimsonHttpServer();
   
-  server.filters.add(new Logger(Logger.WARN, Logger.WARN));
+//  server.filters.add(new Logger(Logger.INFO));
 //  server.filters.add(handler)
 //     .add(handler)
 //     .add(handler);

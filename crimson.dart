@@ -39,6 +39,7 @@ interface CrimsonHttpServer default _CrimsonHttpServer {
   /// of [HTTPServer] 
   CrimsonHttpServer([HTTPServer httpServer]);
   
+  
   /// Contains a list of [CrimsonFilter] implementations.
   /// Filters will be called in turn before the endpoints are called.
   /// Each [CrimsonFilter] will be called in turn, and will hand over
@@ -55,6 +56,10 @@ interface CrimsonHttpServer default _CrimsonHttpServer {
   
   /// Starts the server listening for requests
   listen(String host, int port);
+  
+  /// A [Logger] implementation that the [CrimsonHttpServer] and its 
+  /// handlers can make use of.
+  CrimsonLogger logger;
   
 }
 
@@ -80,13 +85,16 @@ interface CrimsonHandlerList<E extends CrimsonHandler>
 /// A [CrimsonHandler] 
 interface CrimsonHandler {
   /// Takes the [request] and [response] from the HTTPServer implementation 
-  /// Returns true if the response is completed.
-  /// This means that filters should *ALWAYS* return false, but 
-  /// endpoints _COULD_ return true (which means that they've handled the 
-  /// request.
-  /// If the result is TRUE, then no further handlers will be processed, and 
-  /// [response.writeDone()] will be called. 
-  bool handle(HTTPRequest request, HTTPResponse response);  
+  /// and a next function which should be called when the handler has completed
+  /// This allows that async handlers can guarentee to have finished 
+  /// before the next handler in the chain is called.
+  /// [server] represents the server which is passing calling this handler.  This
+  /// allows the handler to make use of various things that the server exposes, such
+  /// as [logger].
+  /// If [next] is not called, then no more handlers will be called, and the 
+  /// response will be sent back to the client.  This is desirable for an
+  /// endpoint which has not handled the request.
+  void handle(HTTPRequest request, HTTPResponse response, CrimsonHttpServer server, void next());  
   
   /// The [name] by which we can identify the handler.  This is used in logging.
   /// It should be set as a constant value in any implementations.
@@ -98,18 +106,37 @@ interface CrimsonHandler {
   /// messages will be shown for this handler.
   int logLevel;
   
+  
 }
 
 
-/// Filters (which implement [CrimsonFilter]) make use of the request 
-/// response (possibly adding to the request or response, 
+/// Filters (which implement [CrimsonFilter]) make use of the request & 
+/// response (possibly adding to the request or response), 
 /// but don't end the flow.
 interface CrimsonFilter extends CrimsonHandler  {
  
 }
 
-/// Endpoints (which implement [CrimsonEndpoint]) make use of the request 
+/// Endpoints (which implement [CrimsonEndpoint]) make use of the request & 
 /// response, and also end the flow (ie, an endpoint will end the response).
 interface CrimsonEndpoint extends CrimsonHandler {
   
+}
+
+/// [CrimsonLogger] interface.  Allows handlers to make use of a logger.
+interface CrimsonLogger {
+  static final int TRACE = 0;
+  static final int DEBUG = 1;
+  static final int INFO = 2;
+  static final int WARN = 3;
+  static final int ERROR = 4;
+  
+  static final List<String> LEVEL_TEXT = const["TRACE", "DEBUG", "INFO", "WARN", "ERROR"];
+  
+  void log(String message, int level);
+  void trace(String message); 
+  void debug(String message); 
+  void info(String message); 
+  void warn(String message); 
+  void error(String message);
 }
