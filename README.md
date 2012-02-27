@@ -26,7 +26,7 @@ Usage: See test/crimsonTest.dart for example, but it goes something like this...
 			  .add(someOtherFilter)
 			  .add(etc);
      server.endpoints.add(new Favicon())                               //DONE
-			  .add(new StaticFile("./public"))                         //DONE
+			  .add(new StaticFile("./public"))                         //DONE but fragile and insecure
 			  .add(new Route("/customers", onCustomersRoute(req,res))  //TODO
 			  .add(new Route("/other", onOtherRoute(req,res))          //TODO
 			  .add(etc);           //Examples
