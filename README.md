@@ -43,9 +43,9 @@ Usage: See test/crimsonTest.dart for example, but it goes something like this...
 * It's not secure in the slightest, and the StaticFile handler alone will probably allow users to browse your pc!
 
 
-Filters
+#Filters
 * CookieSession: sets a sessioncookie - just ported at the moment and not yet tested.  Treat as pre-alpha.
 
-Endpoints
+#Endpoints
 * Favicon: Serves a favicon from either the default ./favicon.ico or ./public/favicon.ico, or some specified location.
 * StaticFile: serves static files from the path provided in the constructor.  Simply appends the request.uri onto whatever path you provide in, and tries to load it.  Very insecure. 
