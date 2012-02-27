@@ -26,7 +26,7 @@ Usage: See test/crimsonTest.dart for example, but it goes something like this...
 			  .add(someOtherFilter)
 			  .add(etc);
      server.endpoints.add(new Favicon())                               //DONE
-			  .add(new StaticFile("./public/"))                        //DONE
+			  .add(new StaticFile("./public"))                         //DONE
 			  .add(new Route("/customers", onCustomersRoute(req,res))  //TODO
 			  .add(new Route("/other", onOtherRoute(req,res))          //TODO
 			  .add(etc);           //Examples
@@ -38,11 +38,14 @@ Usage: See test/crimsonTest.dart for example, but it goes something like this...
 
 	
 #TODO
-- The only thing currently working is the logger and the favicon filter
+* Lots, especially tidy up CookieSession and StaticFile, and add Route.
+* Please treat all of this as pre-alpha.  
+* It's not secure in the slightest, and the StaticFile handler alone will probably allow users to browse your pc!
 
 
 Filters
-- Lots todo
+* CookieSession: sets a sessioncookie - just ported at the moment and not yet tested.  Treat as pre-alpha.
 
 Endpoints
-- Favicon: Serves a favicon from either the default ./favicon.ico or ./public/favicon.ico, or some specified location.
+* Favicon: Serves a favicon from either the default ./favicon.ico or ./public/favicon.ico, or some specified location.
+* StaticFile: serves static files from the path provided in the constructor.  Simply appends the request.uri onto whatever path you provide in, and tries to load it.  Very insecure. 
