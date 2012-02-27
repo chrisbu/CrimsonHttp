@@ -72,7 +72,7 @@ interface CrimsonHandlerList<E extends CrimsonHandler>
                    default _CrimsonHandlerList {
   
   ///default constructor
-  CrimsonHandlerList();                     
+  CrimsonHandlerList(CrimsonHttpServer owner);                     
                      
   /// Adds a [CrimsonHandler] to the list.  
   /// Returns itself to allow for 
@@ -86,7 +86,40 @@ interface CrimsonHandlerList<E extends CrimsonHandler>
 
 /// A [CrimsonHandler] 
 interface CrimsonHandler {
-  /// Takes the [request] and [response] from the HTTPServer implementation 
+  
+  /// The [name] by which we can identify the handler.  This is used in logging.
+  /// It should be set as a constant value in any implementations.
+  String get NAME();
+  
+  /// The [CrimsonHttpServer] to which this handler belongs.
+  /// The handler can use this reference to access things like logger etc...
+  CrimsonHttpServer server;
+}
+
+
+/// Filters (which implement [CrimsonFilter]) make use of the request & 
+/// response (possibly adding to the request or response), 
+/// but don't end the flow.
+interface CrimsonFilter extends CrimsonHandler  {
+/// Takes the [request] and [response] from the HTTPServer implementation 
+  /// and a next function which should be called when the handler has completed
+  /// This allows that async handlers can guarentee to have finished 
+  /// before the next handler in the chain is called.
+  /// [server] represents the server which is passing calling this handler.  This
+  /// allows the handler to make use of various things that the server exposes, such
+  /// as [logger].
+  /// If [next] is not called, then no more handlers will be called, and the 
+  /// response will be sent back to the client.  This is desirable for an
+  /// endpoint which has not handled the request.
+  void handle(CrimsonHttpRequest request, HTTPResponse response, 
+              void next(CrimsonHttpException error));  
+  
+}
+
+/// Endpoints (which implement [CrimsonEndpoint]) make use of the request & 
+/// response, and also end the flow (ie, an endpoint will end the response).
+interface CrimsonEndpoint extends CrimsonHandler {
+/// Takes the [request] and [response] from the HTTPServer implementation 
   /// and a next function which should be called when the handler has completed
   /// This allows that async handlers can guarentee to have finished 
   /// before the next handler in the chain is called.
@@ -98,28 +131,17 @@ interface CrimsonHandler {
   /// endpoint which has not handled the request.
   /// optional [success] callback when a handler successfully handles 
   /// the request.
-  void handle(HTTPRequest request, HTTPResponse response, 
-              CrimsonHttpServer server, 
+  void handle(CrimsonHttpRequest request, HTTPResponse response, 
               void next(CrimsonHttpException error), 
-              [void success()]);  
-  
-  /// The [name] by which we can identify the handler.  This is used in logging.
-  /// It should be set as a constant value in any implementations.
-  String get NAME();
+              void success());  
   
 }
 
 
-/// Filters (which implement [CrimsonFilter]) make use of the request & 
-/// response (possibly adding to the request or response), 
-/// but don't end the flow.
-interface CrimsonFilter extends CrimsonHandler  {
- 
-}
+/// Adds session interface to the request
+interface CrimsonHttpRequest extends HTTPRequest {
 
-/// Endpoints (which implement [CrimsonEndpoint]) make use of the request & 
-/// response, and also end the flow (ie, an endpoint will end the response).
-interface CrimsonEndpoint extends CrimsonHandler {
+  Session get session;
   
 }
 
@@ -135,4 +157,8 @@ class CrimsonHttpException implements HTTPException {
   toString() {
     return stack == null ? "${status}: ${message}" : "${status}: ${message}\n${stack}";    
   }
+}
+
+interface Session extends Map<String, Object> default SessionImpl {
+  
 }

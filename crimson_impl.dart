@@ -19,8 +19,8 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
   {
     //would prefer to make these final, but we don't have access
     //to this at that point.
-    _filters = new CrimsonHandlerList<CrimsonFilter>();
-    _endpoints = new CrimsonHandlerList<CrimsonEndpoint>();
+    _filters = new CrimsonHandlerList<CrimsonFilter>(this);
+    _endpoints = new CrimsonHandlerList<CrimsonEndpoint>(this);
     _httpServer.errorHandler = _httpErrorHandler;
   }
   
@@ -40,9 +40,11 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
   /// The loops need to be able to run async, and as such, each of the handle
   /// calls need to call next(); 
   _onRequestHandler(HTTPRequest req, HTTPResponse res) {
+    _CrimsonHttpRequest request = req;
     logger.info("${req.method}: ${req.uri}");
     
-    _processFilters(req,res,onAllComplete() {
+    
+    _processFilters(request,res,onAllComplete() {
       _processHandlers(req,res);  
     });
     
@@ -52,7 +54,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
   
   /// Process all the [filters] in the list.
   /// If a filter generates an error, then it is logged, but we still contiune.
-  _processFilters(HTTPRequest req, HTTPResponse res, void onAllComplete()) {
+  _processFilters(CrimsonHttpRequest req, HTTPResponse res, void onAllComplete()) {
     Iterator filterIterator = filters.iterator();
     CrimsonFilter filter = null;
     
@@ -66,7 +68,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
       if (filterIterator.hasNext()) {
         filter = filterIterator.next();
         try {
-          filter.handle(req, res, this, (var err) => next(err));
+          filter.handle(req, res, (var err) => next(err));
         }
         catch (Exception ex, var stack){
           //call next, passing in the exception details so that we can log it.
@@ -86,7 +88,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
   
   /// Process all the [endpoints] in the list
   /// If an endpoint generates and error, it is logged, and we fail with a 500 
-  _processHandlers(HTTPRequest req, HTTPResponse res) {
+  _processHandlers(CrimsonHttpRequest req, HTTPResponse res) {
     Iterator endpointIterator = endpoints.iterator();
     CrimsonEndpoint endpoint = null;
     
@@ -102,7 +104,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
         endpoint = endpointIterator.next();
         //call the handler, passing in this function to allow recursing.
         try {
-          endpoint.handle(req, res, this, 
+          endpoint.handle(req, res, 
                (var err) => next(err), 
                success() => res.writeDone()); //second closure represents success
         }
@@ -155,8 +157,11 @@ class _CrimsonHandlerList<E extends CrimsonHandler> implements CrimsonHandlerLis
   /// pass all the methods that would be overrideen to that list.
   final Map<String,CrimsonHandler> _internalMap;
   
-  _CrimsonHandlerList() : 
-    _internalMap = new Map<String,CrimsonHandler>()
+  final CrimsonHttpServer _server;
+  
+  _CrimsonHandlerList(CrimsonHttpServer owner) : 
+    _internalMap = new Map<String,CrimsonHandler>(),
+    _server = owner
    {
       //intentionally blank.
    }
@@ -168,6 +173,7 @@ class _CrimsonHandlerList<E extends CrimsonHandler> implements CrimsonHandlerLis
     }
     
     _internalMap[handler.NAME] = handler;
+    handler.server = _server;
     return this;
   }
   
@@ -202,3 +208,41 @@ class _CrimsonHandlerList<E extends CrimsonHandler> implements CrimsonHandlerLis
 //  void insertRange(int start, int l, [CrimsonHandler initialValue]) => _internalList.insertRange(start, l, initialValue);
 }
 
+
+class _CrimsonHttpRequestImpl extends HTTPRequestImplementation implements CrimsonHttpRequest {
+  Session session;
+  
+}
+
+class SessionImpl implements Session {
+  
+  Map<String, Object> _internalList;
+  
+  bool containsValue(Object value) => _internalList.containsValue(value);
+  
+  bool containsKey(String key) => _internalList.containsKey(key);
+  
+  Object operator[](String key) => _internalList[key];
+  
+  void operator[]=(String key, Object value) {
+    _internalList[key] = value;
+  }
+  
+  Object putIfAbsent(String key, Object put()) => _internalList.putIfAbsent(key,put);
+  
+  Object remove(String key) => _internalList.remove(key);
+  
+  void clear() => _internalList.clear();
+  
+  void forEach(void f(String key, Object value)) {
+    _internalList.forEach(f);
+  }
+  
+  Collection getKeys() => _internalList.getKeys();
+  
+  Collection getValues() => _internalList.getValues();
+  
+  int get length() => _internalList.length;
+  
+  bool isEmpty() => _internalList.isEmpty();
+}

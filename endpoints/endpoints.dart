@@ -5,4 +5,5 @@
 #import("../lib/http.dart");
 
 #source('favicon.dart');
+#source('staticFile.dart');
 

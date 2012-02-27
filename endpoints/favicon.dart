@@ -8,11 +8,13 @@ class Favicon implements CrimsonEndpoint {
   
   Favicon([String this.pathToFavicon = null]);
   
+  CrimsonHttpServer server;
+  
   /// If [pathToFavicon] is null, attempts to load the favicon.ico in the 
   /// current folder, or the current folder/public.
   /// If [pathToFavicon] is not null, then it will attempt to load favicon.ico
   /// from that location
-  void handle(HTTPRequest request, HTTPResponse response, CrimsonHttpServer server, void next(var error), [void success()]) {
+  void handle(HTTPRequest request, HTTPResponse response, void next(var error), success()) {
     
     //check whether this request is for favicon.
     if (request.uri.endsWith("/favicon.ico") == false) {
@@ -38,23 +40,21 @@ class Favicon implements CrimsonEndpoint {
     };
     
     if (this.pathToFavicon == null) {
-      _loadFromPath(server, "./favicon.ico", onSuccess, fail() {
+      _loadFromPath("./favicon.ico", onSuccess, fail() {
         //failure handler - try the next in line...
-        _loadFromPath(server, "./public/favicon.ico", onSuccess, on404NotFound);
+        _loadFromPath("./public/favicon.ico", onSuccess, on404NotFound);
       });  
     }
     else {
       //load from the custom path set.
-      _loadFromPath(server, pathToFavicon, onSuccess, on404NotFound);
+      _loadFromPath(pathToFavicon, onSuccess, on404NotFound);
     }
-    
-    
     
     
   }
   
   
-  _loadFromPath(server, String path, success(List data), fail()) {
+  _loadFromPath(String path, success(List data), fail()) {
     File file = new File(path);
     
     file.fullPathHandler = (String fullPath) {

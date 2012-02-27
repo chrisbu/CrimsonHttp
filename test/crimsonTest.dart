@@ -9,8 +9,11 @@
 main() {
   CrimsonHttpServer server = new CrimsonHttpServer();
   
-  //server.filters.add(handler);
-  server.endpoints.add(new Favicon());
+  server.filters
+      .add(new CookieSession());
+  server.endpoints
+      .add(new Favicon())
+      .add(new StaticFile("./public"));
   
   server.listen("127.0.0.1", 8082);
 }
