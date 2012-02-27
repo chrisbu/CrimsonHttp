@@ -1,6 +1,7 @@
 #library("crimson:core");
 
 #import("lib/http.dart");
+#import('../log4dart/LogLib.dart');
 #import("dart:io");
 #source('crimson_impl.dart');
 #source('crimson_utils.dart');
@@ -60,7 +61,7 @@ interface CrimsonHttpServer default _CrimsonHttpServer {
   
   /// A [Logger] implementation that the [CrimsonHttpServer] and its 
   /// handlers can make use of.
-  CrimsonLogger logger;
+  Logger logger;
   
 }
 
@@ -99,19 +100,12 @@ interface CrimsonHandler {
   /// the request.
   void handle(HTTPRequest request, HTTPResponse response, 
               CrimsonHttpServer server, 
-              void next([CrimsonHttpException error]), 
+              void next(CrimsonHttpException error), 
               [void success()]);  
   
   /// The [name] by which we can identify the handler.  This is used in logging.
   /// It should be set as a constant value in any implementations.
   String get NAME();
-  
-  /// The [logLevel] to which the handler will output to the standard crimson
-  /// logger.  
-  /// For example, if the logLevel is Logger.DEBUG, then all debug and above
-  /// messages will be shown for this handler.
-  int logLevel;
-  
   
 }
 
@@ -127,24 +121,6 @@ interface CrimsonFilter extends CrimsonHandler  {
 /// response, and also end the flow (ie, an endpoint will end the response).
 interface CrimsonEndpoint extends CrimsonHandler {
   
-}
-
-/// [CrimsonLogger] interface.  Allows handlers to make use of a logger.
-interface CrimsonLogger {
-  static final int TRACE = 0;
-  static final int DEBUG = 1;
-  static final int INFO = 2;
-  static final int WARN = 3;
-  static final int ERROR = 4;
-  
-  static final List<String> LEVEL_TEXT = const["TRACE", "DEBUG", "INFO", "WARN", "ERROR"];
-  
-  void log(String message, int level);
-  void trace(String message); 
-  void debug(String message); 
-  void info(String message); 
-  void warn(String message); 
-  void error(String message);
 }
 
 /// Exception handler which takes the [status] and the [message]

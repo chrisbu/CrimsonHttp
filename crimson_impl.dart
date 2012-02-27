@@ -6,9 +6,8 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
   /// Contains the complete list of handlers which implement [CrimsonEndpoint]
   CrimsonHandlerList<CrimsonEndpoint> get endpoints() => _endpoints;
   
-  /// Contains the logger (which will default to [_NullLogger] if not otherwise
-  /// defined
-  CrimsonLogger logger;
+  /// Contains the [logger]
+  Logger logger;
   
   
   /// Constructor
@@ -16,13 +15,13 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
     //if the optional parameter hasn't been passed, then create
     //a new HTTPServer
     _httpServer = httpServer == null ? new HTTPServer() : httpServer,
-    logger = new _NullLogger()
+    logger = LoggerFactory.getLogger("_CrimsonHttpServer")
   {
     //would prefer to make these final, but we don't have access
     //to this at that point.
     _filters = new CrimsonHandlerList<CrimsonFilter>();
     _endpoints = new CrimsonHandlerList<CrimsonEndpoint>();
-    _httpServer.errorHandler = _errorHandler;
+    _httpServer.errorHandler = _httpErrorHandler;
   }
   
   /// Start listening on the [host] and [port] provided.
@@ -58,20 +57,20 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
     CrimsonFilter filter = null;
     
     //closure to allow chaining async handlers
-    next([error]) {
+    next([CrimsonHttpException error]) {
       if (error != null) {
         print("in filter error handler: ${error}");
-        logger.error(error);  
+        logger.error(error.toString());  
       }
       
       if (filterIterator.hasNext()) {
         filter = filterIterator.next();
         try {
-          filter.handle(req, res, this, next([error]) => next(error));
+          filter.handle(req, res, this, (var err) => next(err));
         }
         catch (Exception ex, var stack){
           //call next, passing in the exception details so that we can log it.
-          next("${ex}: ${stack}");
+          next(new CrimsonHttpException(HTTPStatus.INTERNAL_SERVER_ERROR, ex, stack));
         } 
       }
       else {
@@ -96,15 +95,15 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
       
       if (error != null) {
         //if there is an error, then END (no more recursing - note the else...
-        logger.error(error);
-        _errorHandler(error,req,res);
+        logger.error(error.toString());
+        _crimsonErrorHandler(error,req,res);
       }
       else if (endpointIterator.hasNext()) {
         endpoint = endpointIterator.next();
         //call the handler, passing in this function to allow recursing.
         try {
           endpoint.handle(req, res, this, 
-               ([CrimsonHttpException error = null]) => next(error), 
+               (var err) => next(err), 
                success() => res.writeDone()); //second closure represents success
         }
         catch (Exception ex, var stack) {
@@ -113,7 +112,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
       } else {
         //if we've got here, and there are no errors
         //then we've not found a matching endpoint, so return a 404 error.
-        _errorHandler(new CrimsonHttpException(HTTPStatus.NOT_FOUND, "Not found"), req, res);
+        _crimsonErrorHandler(new CrimsonHttpException(HTTPStatus.NOT_FOUND, "Not found"), req, res);
       }
       
     }
@@ -122,11 +121,16 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
     next();
   }
   
-  _errorHandler(CrimsonHttpException error, HTTPRequest req, HTTPResponse res) {
+  _httpErrorHandler(String error) {
+    CrimsonHttpException ex = new CrimsonHttpException(HTTPStatus.INTERNAL_SERVER_ERROR, error);
+    _crimsonErrorHandler(ex, null, null);
+  }
+  
+  _crimsonErrorHandler(CrimsonHttpException error, HTTPRequest req, HTTPResponseImplementation res) {
     this.logger.error(error.toString());
     res.statusCode = error.status;
     res.setHeader("Content-Type", "text/plain");
-    res.writeString("CrimsonHttp: Error");
+    res.writeString("CrimsonHttp: Error\n");
     res.writeString(error.toString());
     res.writeString("\nMethod: ${req.method}: ${req.uri}");
     res.writeDone();
@@ -198,16 +202,3 @@ class _CrimsonHandlerList<E extends CrimsonHandler> implements CrimsonHandlerLis
 //  void insertRange(int start, int l, [CrimsonHandler initialValue]) => _internalList.insertRange(start, l, initialValue);
 }
 
-
-
-/// A defualt logger for [CrimsonHttpServer] to use
-/// sends log messages no-where.
-/// ensures that we don't end up with NPE when trying to log things.
-class _NullLogger implements CrimsonLogger {
-  void trace(String message) => null;
-  void debug(String message) => null;
-  void info(String message) => null;
-  void warn(String message) => null;
-  void error(String message) => null;
-  void log(String message, int level) => null;
-}
