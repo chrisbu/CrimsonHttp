@@ -7,6 +7,10 @@
 #source('crimson_impl.dart');
 #source('crimson_utils.dart');
 
+#source('endpoints/favicon.dart');
+#source('endpoints/staticFile.dart');
+#source('filters/cookieSession.dart');
+
 
 /// Crimson is a set of HTTP middleware for Dart, loosely based upon 
 /// sencha connect [https://github.com/senchalabs/connect]

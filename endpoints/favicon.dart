@@ -35,7 +35,7 @@ class Favicon implements CrimsonEndpoint {
     };
     
     on404NotFound() {
-      CrimsonHttpException ex = new CrimsonHttpException(HTTPStatus.NOT_FOUND, "favicon.ico not found");
+      CrimsonHttpException ex = new CrimsonHttpException(HttpStatus.NOT_FOUND, "favicon.ico not found");
       next(ex);
     };
     
