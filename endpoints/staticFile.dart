@@ -12,14 +12,14 @@ class StaticFile implements CrimsonEndpoint {
   /// it will assume that a future endpoint will try to handle ie.
   StaticFile(String this.rootPath); 
   
-  void handle(HTTPRequest request, HTTPResponse response, void next(var error), success()) {
+  void handle(HttpRequest request, HttpResponse response, void next(var error), success()) {
     String fileToLoad = this.rootPath + request.uri;
     
     onSuccess(List data) {
       server.logger.debug("Read file: ${fileToLoad}");
       response.setHeader("Content-Length", data.length.toString());
       //TODO: add other headers
-      response.writeList(data, 0, data.length);
+      response.outputStream.write(data);
       success();
     }
     
@@ -29,35 +29,27 @@ class StaticFile implements CrimsonEndpoint {
   _loadFromPath(String path, success(List data), fail()) {
     File file = new File(path);
     
-    file.fullPathHandler = (String fullPath) {
-      print(fullPath);
-    };
-    file.fullPath();
+    file.fullPath((String fullPath) => print(fullPath));
     
-    file.readAsBytesHandler = (List buffer) {
-      server.logger.debug("successfully read ${path}");
-      success(buffer);
-    };
-    
-    
-    file.errorHandler = (String error) {
+    file.onError = (String error) {
       server.logger.debug("${path} doesn't exist: ${error}");
       fail();
     };
     
-    file.existsHandler = (bool exists) {
+    server.logger.debug("trying to open file");
+    file.exists((bool exists) {
       if (exists) {
         server.logger.debug("${path} exists, so reading");
-        file.readAsBytes();
+        file.readAsBytes( (List buffer) {
+          server.logger.debug("successfully read ${path}");
+          success(buffer);
+        });
       }
       else {
         server.logger.debug("${path} doesn't exist");
         fail();
       }
-    };
-    
-    server.logger.debug("trying to open file");
-    file.exists();
+    });
   }
   
   final String NAME = "StaticFile";

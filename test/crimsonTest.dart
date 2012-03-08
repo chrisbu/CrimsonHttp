@@ -13,7 +13,7 @@ main() {
       .add(new CookieSession());
   server.endpoints
       .add(new Favicon())
-      .add(new StaticFile("./public"));
+      .add(new StaticFile("./test/public"));
   
   server.listen("127.0.0.1", 8082);
 }

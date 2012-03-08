@@ -14,7 +14,7 @@ class Favicon implements CrimsonEndpoint {
   /// current folder, or the current folder/public.
   /// If [pathToFavicon] is not null, then it will attempt to load favicon.ico
   /// from that location
-  void handle(HTTPRequest request, HTTPResponse response, void next(var error), success()) {
+  void handle(HttpRequest request, HttpResponse response, void next(var error), success()) {
     
     //check whether this request is for favicon.
     if (request.uri.endsWith("/favicon.ico") == false) {
@@ -30,7 +30,7 @@ class Favicon implements CrimsonEndpoint {
       response.setHeader("Content-Type", "image/x-icon");
       response.setHeader("Content-Length", "${data.length}");
       response.setHeader("Cache-Control", "public, max-age=86400"); //1 day
-      response.writeList(data, 0, data.length);
+      response.outputStream.write(data);
       success();
     };
     
@@ -57,35 +57,35 @@ class Favicon implements CrimsonEndpoint {
   _loadFromPath(String path, success(List data), fail()) {
     File file = new File(path);
     
-    file.fullPathHandler = (String fullPath) {
+    file.fullPath((String fullPath) {
       print(fullPath);
-    };
-    file.fullPath();
-    
-    file.readAsBytesHandler = (List buffer) {
-      server.logger.debug("successfully read ${path}");
-      success(buffer);
-    };
+    });
     
     
-    file.errorHandler = (String error) {
+    file.onError = (String error) {
       server.logger.debug("${path} doesn't exist: ${error}");
       fail();
     };
     
-    file.existsHandler = (bool exists) {
+    
+    server.logger.debug("trying to open file");
+    
+    file.exists((bool exists) {
       if (exists) {
         server.logger.debug("${path} exists, so reading");
-        file.readAsBytes();
+        file.readAsBytes((List buffer) {
+          server.logger.debug("successfully read ${path}");
+          success(buffer);
+        });
       }
       else {
         server.logger.debug("${path} doesn't exist");
         fail();
       }
-    };
+    });
     
-    server.logger.debug("trying to open file");
-    file.exists();
+    
+   
   }
   
   

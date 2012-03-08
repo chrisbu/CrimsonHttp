@@ -7,7 +7,7 @@ class CookieSession implements CrimsonFilter {
 
   CrimsonHttpServer server;
   
-  void handle(CrimsonHttpRequest req, HTTPResponse res, void next(error)) {
+  void handle(HttpRequest req, HttpResponse res, void next(error)) {
     if (req.path.endsWith("favicon.ico")) {
       //don't do session checking for favicon
       return next(null);
@@ -40,7 +40,7 @@ class CookieSession implements CrimsonFilter {
   /**
   * return the session associated with the request.
   */
-  Session _getSession(HTTPRequest req) {
+  Session _getSession(HttpRequest req) {
     //TODO - CJB: Fix this - it's fragile.
      
     //tempcookie takes precdence, as it's been added.
@@ -78,7 +78,7 @@ class CookieSession implements CrimsonFilter {
   /**
   *  Adds a session cookie  
   */
-  Session _checkSession(HTTPRequest req, HTTPResponse res) {
+  Session _checkSession(HttpRequest req, HttpResponse res) {
     String sessionid = null;
     bool addSessionCookie = false;
     

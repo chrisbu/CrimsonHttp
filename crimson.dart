@@ -1,7 +1,8 @@
 #library("crimson:core");
 
-#import("lib/http.dart");
+//#import("lib/http.dart");
 #import('../log4dart/LogLib.dart');
+#import("dart:builtin");
 #import("dart:io");
 #source('crimson_impl.dart');
 #source('crimson_utils.dart');
@@ -39,7 +40,7 @@ interface CrimsonHttpServer default _CrimsonHttpServer {
   /// [HTTPServer] implementation which may have already been created.
   /// If none is supplied, then it creates it's own internal instance
   /// of [HTTPServer] 
-  CrimsonHttpServer([HTTPServer httpServer]);
+  CrimsonHttpServer([HttpServer httpServer]);
   
   
   /// Contains a list of [CrimsonFilter] implementations.
@@ -111,7 +112,7 @@ interface CrimsonFilter extends CrimsonHandler  {
   /// If [next] is not called, then no more handlers will be called, and the 
   /// response will be sent back to the client.  This is desirable for an
   /// endpoint which has not handled the request.
-  void handle(CrimsonHttpRequest request, HTTPResponse response, 
+  void handle(HttpRequest request, HttpResponse response, 
               void next(CrimsonHttpException error));  
   
 }
@@ -131,31 +132,23 @@ interface CrimsonEndpoint extends CrimsonHandler {
   /// endpoint which has not handled the request.
   /// optional [success] callback when a handler successfully handles 
   /// the request.
-  void handle(CrimsonHttpRequest request, HTTPResponse response, 
+  void handle(HttpRequest request, HttpResponse response, 
               void next(CrimsonHttpException error), 
               void success());  
   
 }
 
-
-/// Adds session interface to the request
-interface CrimsonHttpRequest extends HTTPRequest {
-
-  Session get session;
-  
-}
-
 /// Exception handler which takes the [status] and the [message]
-class CrimsonHttpException implements HTTPException {
+class CrimsonHttpException extends HttpException {
   
-  CrimsonHttpException(this.status, this.message, [this.stack=null]);
+  CrimsonHttpException(this.status, this.msg, [this.stack=null]);
   
   final int status;
-  final String message;
+  final String msg;
   final String stack;
   
   toString() {
-    return stack == null ? "${status}: ${message}" : "${status}: ${message}\n${stack}";    
+    return stack == null ? "${status}: ${msg}" : "${status}: ${msg}\n${stack}";    
   }
 }
 

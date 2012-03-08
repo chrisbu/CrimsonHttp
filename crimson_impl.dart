@@ -11,24 +11,25 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
   
   
   /// Constructor
-  _CrimsonHttpServer([HTTPServer httpServer]) :
+  _CrimsonHttpServer([HttpServer httpServer]) :
     //if the optional parameter hasn't been passed, then create
-    //a new HTTPServer
-    _httpServer = httpServer == null ? new HTTPServer() : httpServer,
+    //a new HttpServer
+    _httpServer = httpServer == null ? new HttpServer() : httpServer,
     logger = LoggerFactory.getLogger("_CrimsonHttpServer")
   {
     //would prefer to make these final, but we don't have access
     //to this at that point.
     _filters = new CrimsonHandlerList<CrimsonFilter>(this);
     _endpoints = new CrimsonHandlerList<CrimsonEndpoint>(this);
-    _httpServer.errorHandler = _httpErrorHandler;
+    _httpServer.onError = _httpErrorHandler;
   }
   
   /// Start listening on the [host] and [port] provided.
   /// Calls the internal [_onRequestHandler] method when a request is received
   /// which internall processes all the filters and tries to find an endpoint.
   listen(String host, int port) {
-    _httpServer.listen(host, port, _onRequestHandler);
+    _httpServer.onRequest = _onRequestHandler;
+    _httpServer.listen(host, port);
     print("Listening on ${host}:${port}");
   }
   
@@ -39,8 +40,8 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
   /// ---
   /// The loops need to be able to run async, and as such, each of the handle
   /// calls need to call next(); 
-  _onRequestHandler(HTTPRequest req, HTTPResponse res) {
-    _CrimsonHttpRequest request = req;
+  _onRequestHandler(HttpRequest req, HttpResponse res) {
+    HttpRequest request = req;
     logger.info("${req.method}: ${req.uri}");
     
     
@@ -54,7 +55,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
   
   /// Process all the [filters] in the list.
   /// If a filter generates an error, then it is logged, but we still contiune.
-  _processFilters(CrimsonHttpRequest req, HTTPResponse res, void onAllComplete()) {
+  _processFilters(HttpRequest req, HttpResponse res, void onAllComplete()) {
     Iterator filterIterator = filters.iterator();
     CrimsonFilter filter = null;
     
@@ -72,7 +73,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
         }
         catch (Exception ex, var stack){
           //call next, passing in the exception details so that we can log it.
-          next(new CrimsonHttpException(HTTPStatus.INTERNAL_SERVER_ERROR, ex, stack));
+          next(new CrimsonHttpException(HttpStatus.INTERNAL_SERVER_ERROR, ex, stack));
         } 
       }
       else {
@@ -88,7 +89,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
   
   /// Process all the [endpoints] in the list
   /// If an endpoint generates and error, it is logged, and we fail with a 500 
-  _processHandlers(CrimsonHttpRequest req, HTTPResponse res) {
+  _processHandlers(HttpRequest req, HttpResponse res) {
     Iterator endpointIterator = endpoints.iterator();
     CrimsonEndpoint endpoint = null;
     
@@ -106,15 +107,15 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
         try {
           endpoint.handle(req, res, 
                (var err) => next(err), 
-               success() => res.writeDone()); //second closure represents success
+               success() => res.outputStream.close()); //second closure represents success
         }
         catch (Exception ex, var stack) {
-          next(new CrimsonHttpException(HTTPStatus.INTERNAL_SERVER_ERROR, ex, stack));
+          next(new CrimsonHttpException(HttpStatus.INTERNAL_SERVER_ERROR, ex, stack));
         }
       } else {
         //if we've got here, and there are no errors
         //then we've not found a matching endpoint, so return a 404 error.
-        _crimsonErrorHandler(new CrimsonHttpException(HTTPStatus.NOT_FOUND, "Not found"), req, res);
+        _crimsonErrorHandler(new CrimsonHttpException(HttpStatus.NOT_FOUND, "Not found"), req, res);
       }
       
     }
@@ -124,18 +125,18 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
   }
   
   _httpErrorHandler(String error) {
-    CrimsonHttpException ex = new CrimsonHttpException(HTTPStatus.INTERNAL_SERVER_ERROR, error);
+    CrimsonHttpException ex = new CrimsonHttpException(HttpStatus.INTERNAL_SERVER_ERROR, error);
     _crimsonErrorHandler(ex, null, null);
   }
   
-  _crimsonErrorHandler(CrimsonHttpException error, HTTPRequest req, HTTPResponseImplementation res) {
+  _crimsonErrorHandler(CrimsonHttpException error, HttpRequest req, HttpResponse res) {
     this.logger.error(error.toString());
     res.statusCode = error.status;
     res.setHeader("Content-Type", "text/plain");
     res.writeString("CrimsonHttp: Error\n");
     res.writeString(error.toString());
     res.writeString("\nMethod: ${req.method}: ${req.uri}");
-    res.writeDone();
+    res.outputStream.close();
     //TODO: If an error handler filter has been registered, then use that.
     //Might be better to have an errorHandler collection in the same
     //way that we have filters and endpoints.
@@ -143,7 +144,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
   
   CrimsonHandlerList<CrimsonFilter> _filters;
   CrimsonHandlerList<CrimsonEndpoint> _endpoints;
-  final HTTPServer _httpServer;
+  final HttpServer _httpServer;
   
 }
 
@@ -208,11 +209,11 @@ class _CrimsonHandlerList<E extends CrimsonHandler> implements CrimsonHandlerLis
 //  void insertRange(int start, int l, [CrimsonHandler initialValue]) => _internalList.insertRange(start, l, initialValue);
 }
 
-
-class _CrimsonHttpRequestImpl extends HTTPRequestImplementation implements CrimsonHttpRequest {
-  Session session;
-  
-}
+// TODO: Broken with the dart:io
+//class _CrimsonHttpRequestImpl implements CrimsonHttpRequest {
+//  Session session;
+//  
+//}
 
 class SessionImpl implements Session {
   
