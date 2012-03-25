@@ -5,16 +5,30 @@
 /// making it available to other calls.
 class CookieSession implements CrimsonFilter {
 
+  Logger logger;
   CrimsonHttpServer server;
   
-  void handle(HttpRequest req, HttpResponse res, void next(error)) {
+  CookieSession() {
+    logger = LoggerFactory.getLogger("CookieSession");
+    _sessions = new Map<String,Session>();
+  }
+  
+  Future<CrimsonData> handle(HttpRequest req, HttpResponse res, CrimsonData data) {
+    Completer completer = new Completer();
     if (req.path.endsWith("favicon.ico")) {
       //don't do session checking for favicon
-      return next(null);
+      return null;
     }
     
-    Session session = _getSession(req);
-    next(null);
+    Session session = _checkSession(req,res);
+    if (session != null) {
+      logger.debug("Got session");
+      data["SESSION"] = session;
+    }
+    else {
+      logger.debug("Did not get session");
+    }
+    return null;
   }
   
   
@@ -42,31 +56,35 @@ class CookieSession implements CrimsonFilter {
   */
   Session _getSession(HttpRequest req) {
     //TODO - CJB: Fix this - it's fragile.
-     
+    logger.debug("in _getSession");
     //tempcookie takes precdence, as it's been added.
     String cookieHeader = req.headers["tempcookie"];
     if (cookieHeader == null) {
       //otherwise, look for a real cookie header.
       cookieHeader = req.headers["cookie"];
       if (cookieHeader != null) {
-        print("found real cookie header: " + cookieHeader);
+        logger.debug("found real cookie header: " + cookieHeader);
+      }
+      else {
+        logger.debug("didn't find existing cookie header");
       }
     }
     else {
-      print("tempCookieHeader=${cookieHeader}");
+      logger.debug("tempCookieHeader=${cookieHeader}");
     }
      
     Session result = null;
      
     if (cookieHeader != null) {
+      logger.debug("found cookie header, so attempting to exract");
       String sessionId = _extractSessionCookieId(cookieHeader);
        
       if (sessionId != null && _sessions.containsKey(sessionId) == true) {
-        print("found sessionid=${sessionId} in sessions object");
+        logger.debug("found sessionid=${sessionId} in sessions object");
         result = _sessions[sessionId];
       }
       else {
-        print("sessionId=${sessionId} not found in sessions object");  
+        logger.debug("sessionId=${sessionId} not found in sessions object");  
         //so we'll return null in the result.
       }
     }
@@ -85,11 +103,11 @@ class CookieSession implements CrimsonFilter {
    
     //is there an existing session?
     Session session = _getSession(req);
-    print("session is null?=${session==null}");
+    logger.debug("session is null?=${session==null}");
     
     if (session == null) {
       //TODO: Refactor
-      print("adding session cookie");
+      logger.debug("adding session cookie");
       
       //is there an existing cookie header? 
       //if so, re-use the session cookie id...
@@ -103,7 +121,11 @@ class CookieSession implements CrimsonFilter {
         //generate a new ID.
         
         //this is a toy - don't use for real!
-        sessionid = (Math.random() * Clock.now()).toInt().toString();    
+        var md5 = new Md5();
+        String s = (Math.random() * Clock.now()).toInt().toString();
+        md5.update(s.charCodes());
+        var hash = md5.digest();
+        sessionid = new String.fromCharCodes(hash);    
       }
 
       //add a new session cookie.
@@ -120,14 +142,14 @@ class CookieSession implements CrimsonFilter {
       //also store the session id in the session
       //this allows callers to get the session id.
       _sessions[sessionid]["session-id"] = sessionid; 
-      print("Created Session: ${sessionid}");
+      logger.debug("Created Session: ${sessionid}");
         
       //add the time the session was first created
       _sessions[sessionid]["first-accessed"] = new Date.now();
 
     }
     else {
-      print("there is already a session cookie");
+      logger.debug("there is already a session cookie");
     } 
 
     
@@ -137,7 +159,7 @@ class CookieSession implements CrimsonFilter {
     session["last-accessed"] = new Date.now(); 
       
     if (req.headers.containsKey("cookie")) {
-      print("Header: cookie=${req.headers['cookie']}");
+      logger.debug("Header: cookie=${req.headers['cookie']}");
     }
     
     return session;

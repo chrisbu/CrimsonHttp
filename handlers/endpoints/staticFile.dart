@@ -1,6 +1,7 @@
 class StaticFile implements CrimsonEndpoint {
 
   String rootPath;
+  Logger logger;
   
   /// Loads the file from the path + the request.uri,
   /// eg: if the [rootPath] is ./public
@@ -10,44 +11,61 @@ class StaticFile implements CrimsonEndpoint {
   /// it will try to load ./public/blah/index.html
   /// This handler will not return an error if it can't find the file.
   /// it will assume that a future endpoint will try to handle ie.
-  StaticFile(String this.rootPath); 
-  
-  void handle(HttpRequest request, HttpResponse response, void next(var error), success()) {
-    String fileToLoad = this.rootPath + request.uri;
-    
-    onSuccess(List data) {
-      server.logger.debug("Read file: ${fileToLoad}");
-      response.setHeader("Content-Length", data.length.toString());
-      //TODO: add other headers
-      response.outputStream.write(data);
-      success();
-    }
-    
-    _loadFromPath(fileToLoad, onSuccess, fail() => next(null)); 
+  StaticFile(String this.rootPath) {
+    logger = LoggerFactory.getLogger("StaticFile");
   }
   
-  _loadFromPath(String path, success(List data), fail()) {
+  Future<CrimsonData> handle(HttpRequest request, HttpResponse response, CrimsonData data) {
+    Completer completer = new Completer();
+    
+    String fileToLoad = this.rootPath + request.uri;
+    
+    onSuccess(List filedata) {
+      logger.debug("Read file: ${fileToLoad}");
+      //response.setHeader("Content-Type", "image/x-icon"); //todo - this properly
+      response.setHeader("Content-Length", "${filedata.length}");
+      //TODO: add other headers
+      response.outputStream.write(filedata);
+      completer.complete(data);
+    }
+    
+    onNotFound() {
+      //if the file isn't found, but there wasn't another error
+      completer.complete(data);
+    }
+    
+    _loadFromPath(fileToLoad, onSuccess, onNotFound, fail(exception) {
+      Options o = new Options();
+      print(o.script);
+      completer.completeException(exception);
+    });
+    
+    return completer.future;
+  }
+  
+  _loadFromPath(String path, success(List data), onNotFound(), fail(exception)) {
     File file = new File(path);
     
-    file.fullPath((String fullPath) => print(fullPath));
+    //file.fullPath((String fullPath) => print(fullPath));
     
-    file.onError = (String error) {
-      server.logger.debug("${path} doesn't exist: ${error}");
-      fail();
+    file.onError = (Exception error) {
+      logger.debug("${path} doesn't exist: ${error}");
+      fail(error);
     };
     
-    server.logger.debug("trying to open file");
+    logger.debug("trying to open file: ${path}");
     file.exists((bool exists) {
+      logger.debug("in exists callback: ${path}, ${exists}");
       if (exists) {
-        server.logger.debug("${path} exists, so reading");
+        logger.debug("${path} exists, so reading");
         file.readAsBytes( (List buffer) {
-          server.logger.debug("successfully read ${path}");
+          logger.debug("successfully read ${path}");
           success(buffer);
         });
       }
       else {
-        server.logger.debug("${path} doesn't exist");
-        fail();
+        logger.debug("${path} doesn't exist");
+        onNotFound();
       }
     });
   }

@@ -1,74 +1,99 @@
+// Copyright (C) 2012 Chris Buckett
+// Use of this source code is governed by a MIT style licence
+// can be found in the LICENSE file.
+// website: 
+
+
 #library("crimson:core");
 
-//#import("lib/http.dart");
-#import('../log4dart/LogLib.dart');
-#import("dart:builtin");
+#import('../../log4dart/LogLib.dart');
 #import("dart:io");
+#import("dart:uri");
+#import("dart:isolate", prefix:"isolate");
 #source('crimson_impl.dart');
 #source('crimson_utils.dart');
+#source('crimsonPrivate.dart');
+#source('crimsonHttpServer.dart');
+#source('crimsonModule.dart');
 
-#source('endpoints/favicon.dart');
-#source('endpoints/staticFile.dart');
-#source('filters/cookieSession.dart');
+
+
+//#source('endpoints/favicon.dart');
+//#source('endpoints/staticFile.dart');
+//#source('filters/cookieSession.dart');
 
 
 /// Crimson is a set of HTTP middleware for Dart, loosely based upon 
 /// sencha connect [https://github.com/senchalabs/connect]
 /// --- 
-/// It allows for filters and endpoints (collectively known as handlers, which
+/// It allows for filters and endpoints (collectively known as *handlers*, which
 /// implement [CrimsonHandler]) to be added to the http request response  
 /// cycle.
-/// Filters (which implement [CrimsonFilter]) make use of the request 
-/// response (possibly adding to the request or response, 
-/// but don't end the flow.
 ///
-/// Endpoints (which implement [CrimsonEndpoint]) make use of the request 
-/// response, and also end the flow (ie, an endpoint will end the response).
+/// There are two interfaces which extend [CrimsonHandler]: [CrimsonFilter] and 
+/// [CrimsonEndpoint]
+///
+/// Filters (which implement [CrimsonFilter]) make use of data on the request 
+/// and possibly add to the repsonse, but don't close the response.
+///
+/// Endpoints (which implement [CrimsonEndpoint]) also can make use of the data
+/// on the request, but when an endpoint writes to the response, it the 
+/// response will be closed.  Endpoints try to match the data passed in on the
+/// request, and if that endpoint matches the data, it will handle the request.
 /// 
-/// All filters will be called, but Endpoints will stop on the first matching
-/// endpoint.
-/// Usage: 
+/// The filters and endpoints are executed in the order that they are added to
+/// the server.  The first endpoint to match, will handle the response, and the
+/// flow will end.
+/// 
+/// *Usage:* 
 ///     CrimsonHttp http = new CrimsonHttp();
-///     http.filters
-///          .add(new Logger())
-///          .add(new Session("mySessionKey"))
-///          .add(/*...any CrimsonFilter implementation...*/);
-///     http.endpoint
-///          .add(new Favicon())
-///          .add(new StaticFiles("/public"))
-///          .add(new Route("/details/{id}",(req,res) => someCallback(req,res));
-///          .add(/*...any CrimsonEndpoint implementation...*/);            
+///     http.use(new Logger())
+///          .endpoint(new Favicon())
+///          .filter(new Session("mySessionKey"))                    
+///          .filter(/*...any CrimsonFilter implementation...*/);
+///          .endpoint(new StaticFiles("/public"))
+///          .endpoint(new Route("/details/{id}",(req,res) => someCallback(req,res));
+///          .endpoint(/*...any CrimsonEndpoint implementation...*/);
+/// 
+/// There is no actual distinction between the [endpoint(CrimsonEndpoint)] 
+/// and the [filter(CrimsonFilter)] functions - they are included to aid 
+/// readability.  You can also use the more generic  more generic 
+/// [add(CrimsonHandler)] function.
 interface CrimsonHttpServer default _CrimsonHttpServer {
   
   /// Creates the [CrimsonHttpServer].  Takes an optional 
-  /// [HTTPServer] implementation which may have already been created.
+  /// [HTTPServer] implementation.
   /// If none is supplied, then it creates it's own internal instance
   /// of [HTTPServer] 
   CrimsonHttpServer([HttpServer httpServer]);
   
-  
-  /// Contains a list of [CrimsonFilter] implementations.
-  /// Filters will be called in turn before the endpoints are called.
-  /// Each [CrimsonFilter] will be called in turn, and will hand over
-  /// to the next filter.
-  CrimsonHandlerList<CrimsonFilter> get filters();
-  
-  /// Contains a list of [CrimsonEndpoint] implementations.
-  /// Each endpoint will be called in turn, and try to match the data 
-  /// provided in the request.
-  /// The first endpoint to match will handle the request and close 
-  /// the response
-  CrimsonHandlerList<CrimsonEndpoint> get endpoints();
-  
-  
   /// Starts the server listening for requests
   listen(String host, int port);
+  
+  /// A list of independent modules.  Each module runs in its own
+  /// isolate, and is matched based upon the uri passed in.
+  /// The key should somehow match the request url or url/path
+  /// to allow hosting multiple, independent sites on the same server
+  /// The value is the path to the isolate
+  /// TODO: Allow this to be loaded from config  
+  LinkedHashMap<String, CrimsonModule> get modules();
   
   /// A [Logger] implementation that the [CrimsonHttpServer] and its 
   /// handlers can make use of.
   Logger logger;
   
 }
+//
+///// The CrimsonModule is an [Isolate] which maintains 
+//interface CrimsonModule {
+//  
+//  /// Contains a list of [CrimsonHandler] implementations.
+//  /// Handler can be either one of a [CrimsonFilter] or [CrimsonEndpoint]
+//  /// implementation.  Each filter or endpoint will be called in turn
+//  /// until an endpoint matches and handles the request
+//  CrimsonHandlerList<CrimsonHandler> get modules();
+//  
+//}
 
 /// Contains a list of [CrimsonHandler].  Is used by [CrimsonHttpServer] to
 /// contain the list of filters and endpoints
@@ -86,7 +111,11 @@ interface CrimsonHandlerList<E extends CrimsonHandler>
   ///           .add(...)
   ///           .add(...)
   ///           .add(...etc...);
-  CrimsonHandlerList add(CrimsonHandler handler); 
+  CrimsonHandlerList add(CrimsonHandler handler);
+  
+  CrimsonHandlerList addEndpoint(CrimsonEndpoint endpoint);
+  
+  CrimsonHandlerList addFilter(CrimsonFilter filter);
 }
 
 /// A [CrimsonHandler] 
@@ -99,6 +128,8 @@ interface CrimsonHandler {
   /// The [CrimsonHttpServer] to which this handler belongs.
   /// The handler can use this reference to access things like logger etc...
   CrimsonHttpServer server;
+  
+  Future<CrimsonData> handle(HttpRequest req, HttpResponse res, CrimsonData data);
 }
 
 
@@ -106,7 +137,7 @@ interface CrimsonHandler {
 /// response (possibly adding to the request or response), 
 /// but don't end the flow.
 interface CrimsonFilter extends CrimsonHandler  {
-/// Takes the [request] and [response] from the HTTPServer implementation 
+  /// Takes the [request] and [response] from the HTTPServer implementation 
   /// and a next function which should be called when the handler has completed
   /// This allows that async handlers can guarentee to have finished 
   /// before the next handler in the chain is called.
@@ -116,8 +147,7 @@ interface CrimsonFilter extends CrimsonHandler  {
   /// If [next] is not called, then no more handlers will be called, and the 
   /// response will be sent back to the client.  This is desirable for an
   /// endpoint which has not handled the request.
-  void handle(HttpRequest request, HttpResponse response, 
-              void next(CrimsonHttpException error));  
+  
   
 }
 
@@ -136,9 +166,11 @@ interface CrimsonEndpoint extends CrimsonHandler {
   /// endpoint which has not handled the request.
   /// optional [success] callback when a handler successfully handles 
   /// the request.
-  void handle(HttpRequest request, HttpResponse response, 
-              void next(CrimsonHttpException error), 
-              void success());  
+   
+  
+}
+
+interface CrimsonData extends Map {
   
 }
 

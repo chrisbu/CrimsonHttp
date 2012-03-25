@@ -5,8 +5,11 @@
 class Favicon implements CrimsonEndpoint {
 
   String pathToFavicon;
+  Logger logger;
   
-  Favicon([String this.pathToFavicon = null]);
+  Favicon([String this.pathToFavicon = null]) {
+    logger = LoggerFactory.getLogger("Favicon");
+  }
   
   CrimsonHttpServer server;
   
@@ -14,29 +17,32 @@ class Favicon implements CrimsonEndpoint {
   /// current folder, or the current folder/public.
   /// If [pathToFavicon] is not null, then it will attempt to load favicon.ico
   /// from that location
-  void handle(HttpRequest request, HttpResponse response, void next(var error), success()) {
+  Future<CrimsonData> handle(HttpRequest request, HttpResponse response, CrimsonData data) {
+    Completer completer = new Completer();
     
     //check whether this request is for favicon.
     if (request.uri.endsWith("/favicon.ico") == false) {
       //if not, simply exit by calling next, and returing.
       //server.logger.debug("Request is not for favicon");
-      return next(null);
+      logger.debug("not for favicon, so completing");
+      return null;      
     }
     
-    server.logger.debug("Handling favicon");
+    logger.debug("Handling favicon");
     
     //otherwise, this request is for the favicon.
-    onSuccess(List data) {
+    onSuccess(List filedata) {
       response.setHeader("Content-Type", "image/x-icon");
-      response.setHeader("Content-Length", "${data.length}");
+      response.setHeader("Content-Length", "${filedata.length}");
       response.setHeader("Cache-Control", "public, max-age=86400"); //1 day
-      response.outputStream.write(data);
-      success();
+      response.outputStream.write(filedata);
+      completer.complete(data);
     };
     
     on404NotFound() {
       CrimsonHttpException ex = new CrimsonHttpException(HttpStatus.NOT_FOUND, "favicon.ico not found");
-      next(ex);
+      logger.debug("favicon not found");
+      completer.completeException(ex);
     };
     
     if (this.pathToFavicon == null) {
@@ -50,42 +56,35 @@ class Favicon implements CrimsonEndpoint {
       _loadFromPath(pathToFavicon, onSuccess, on404NotFound);
     }
     
-    
+    return completer.future; 
   }
   
   
-  _loadFromPath(String path, success(List data), fail()) {
+  _loadFromPath(String path, success(List data), on404NotFound()) {
     File file = new File(path);
     
-    file.fullPath((String fullPath) {
-      print(fullPath);
-    });
-    
-    
-    file.onError = (String error) {
-      server.logger.debug("${path} doesn't exist: ${error}");
-      fail();
+    file.onError = (Exception error) {
+      logger.debug("${path} doesn't exist: ${error}");
+      on404NotFound();
     };
     
     
-    server.logger.debug("trying to open file");
+    logger.debug("trying to open favicon");
     
     file.exists((bool exists) {
       if (exists) {
-        server.logger.debug("${path} exists, so reading");
+        logger.debug("${path} exists, so reading");
         file.readAsBytes((List buffer) {
           server.logger.debug("successfully read ${path}");
           success(buffer);
         });
       }
       else {
-        server.logger.debug("${path} doesn't exist");
-        fail();
+        logger.debug("${path} doesn't exist");
+        on404NotFound();
       }
     });
     
-    
-   
   }
   
   
