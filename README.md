@@ -14,24 +14,21 @@ crimson folder structure).
 Usage: See test/crimsonTest.dart for example, but it goes something like this...
 
     main() {
-     CrimsonHttpServer server = new CrimsonHttpServer();
+      CrimsonHttpServer server = new CrimsonHttpServer();
   
-     // optional - this is created internally in the CrimsonHttpServer ctor
-	 // but you can override it here.
-	 // server.logger = LoggerFactory.getLogger("crimson");
+      CrimsonModule sampleModule = new CrimsonModule(server);
+      sampleModule.handlers
+                    .addEndpoint(new Favicon("./favicon.ico"))               //match the favicon request
+                    .addFilter(new CookieSession())                          //adds session support
+                    .addEndpoint(new Route("/hello","GET",(req,res,data) {   //execute arbitary code that matches a route
+					   res.outputStream.write("Hello");
+					))         
+                    .addEndpoint(new StaticFile("./public"));                //serve static files
   
-     //Add any filters that you might be interested in
-     server.filters.add(new CookieSession())               //DONE but fragile and insecure
-	          .add(otherFilter)                            //examples
-			  .add(someOtherFilter)
-			  .add(etc);
-     server.endpoints.add(new Favicon())                               //DONE
-			  .add(new StaticFile("./public"))                         //DONE but fragile and insecure
-			  .add(new Route("/customers", onCustomersRoute(req,res))  //TODO
-			  .add(new Route("/other", onOtherRoute(req,res))          //TODO
-			  .add(etc);           //Examples
-  
-     server.listen("127.0.0.1", 8082);
+      server.modules["*"] = sampleModule;  //this is the default module.
+   
+      server.listen("127.0.0.1", 8082);
+     
     }
 	
 	
@@ -49,3 +46,4 @@ Usage: See test/crimsonTest.dart for example, but it goes something like this...
 #Endpoints
 * Favicon: Serves a favicon from either the default ./favicon.ico or ./public/favicon.ico, or some specified location.
 * StaticFile: serves static files from the path provided in the constructor.  Simply appends the request.uri onto whatever path you provide in, and tries to load it.  Very insecure. 
+* Route: executes a dart method in resposne to matching a path + method
