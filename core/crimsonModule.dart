@@ -6,7 +6,7 @@ class CrimsonModule  {
   CrimsonHandlerList<CrimsonHandler> _handlers;
   CrimsonHandlerList<CrimsonHandler> get handlers() => _handlers;
   
-  CrimsonModule(this._server) {
+  CrimsonModule(this._server)   {
     logger = LoggerFactory.getLogger("CrimsonModule");
     _handlers = new CrimsonHandlerList<CrimsonHandler>(_server);
   }
@@ -23,9 +23,9 @@ class CrimsonModule  {
       if (data["SUCCESS"] != true) {
         if (handlerIterator.hasNext()) {
           CrimsonHandler handler = handlerIterator.next();
-          print("handler: ${handler.NAME}");
+          print("trying handler: ${handler.NAME}");
           Future<CrimsonData> onHandled = handler.handle(req,res,data);
-          
+        
           //it is valid for a handler to return null, when they are not even 
           //going to attempt to try and handle it, for example, when the 
           // a favicon handler won't bother trying to handle a request
@@ -34,16 +34,30 @@ class CrimsonModule  {
           if (onHandled != null) { 
             
             onHandled.then((result) {
-              handleNext(); //recurse
+              logger.debug("handler handled.");
+              if (result["SUCCESS"] != true) {
+                logger.debug("handler handled = false.");
+                handleNext(); //recurse
+              }
             });  
             onHandled.handleException((error) {
               print("error: ${error}");
-              completer.completeException(error);
+              try {
+                completer.completeException(error);
+              }
+              catch (var ex, var stack) {
+                print(ex);
+                print(stack);
+                //res.outputStream.close();
+              }
+              
             });
           }
           else {
+            logger.debug("handler returned null - trying next");
             handleNext(); //recurse
           }
+        
           
         }
         else {
