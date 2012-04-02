@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Crimsonhttp - http server for Dart by chrisbu</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/chrisbu/CrimsonHttp">Fork On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/chrisbu/CrimsonHttp/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/chrisbu/CrimsonHttp/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Crimsonhttp - http server for Dart</h1>
+          <p>Crimson Dart Http middleware</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/chrisbu">chrisbu</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/mattgraham">mattgraham</a></span>
+        </div>
+
+        <h2>CrimsonHttp server for Dart</h2>
+
+<p>Currently uses the chat sample http server, but will be ported to the 
+dart:io http server once that is released</p>
+
+<p>Loosely inspired upon sencha/connect for node.js</p>
+
+<p>Makes use of log4dart, found here: <a href="https://github.com/Qalqo/log4dart">https://github.com/Qalqo/log4dart</a>
+(It expects to find log4dart in ../log4dart (ie, at the same level as crimson, not within the 
+crimson folder structure).</p>
+
+<hr><p>Usage: See test/crimsonTest.dart for example, but it goes something like this...</p>
+
+<pre><code>main() {
+  CrimsonHttpServer server = new CrimsonHttpServer();
+
+  CrimsonModule sampleModule = new CrimsonModule(server);
+  sampleModule.handlers
+                .addEndpoint(new Favicon("./favicon.ico"))               //match the favicon request
+                .addFilter(new CookieSession())                          //adds session support
+                .addEndpoint(new Route("/hello","GET",(req,res,data) {   //execute arbitary code that matches a route
+                   res.outputStream.write("Hello");
+                ))         
+                .addEndpoint(new StaticFile("./public"));                //serve static files
+
+  server.modules["*"] = sampleModule;  //this is the default module.
+
+  server.listen("127.0.0.1", 8082);
+
+}
+</code></pre>
+
+<h1>TODO</h1>
+
+<ul>
+<li>Lots, especially tidy up CookieSession and StaticFile.</li>
+<li>Route needs parameters adding</li>
+<li>Please treat all of this as pre-alpha.<br>
+</li>
+<li>It's not secure in the slightest, and the StaticFile handler alone will probably allow users to browse your pc!</li>
+</ul><h1>Filters</h1>
+
+<ul>
+<li>CookieSession: sets a sessioncookie - just ported at the moment and not yet tested.  Treat as pre-alpha.</li>
+</ul><h1>Endpoints</h1>
+
+<ul>
+<li>Favicon: Serves a favicon from either the default ./favicon.ico or ./public/favicon.ico, or some specified location.</li>
+<li>StaticFile: serves static files from the path provided in the constructor.  Simply appends the request.uri onto whatever path you provide in, and tries to load it.  Very insecure. </li>
+<li>Route: executes a dart method in resposne to matching a path + method</li>
+</ul>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+  </body>
+</html>
