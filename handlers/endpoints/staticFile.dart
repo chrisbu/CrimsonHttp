@@ -23,7 +23,7 @@ class StaticFile implements CrimsonEndpoint {
     onSuccess(List filedata) {
       logger.debug("Read file: ${fileToLoad}");
       //response.setHeader("Content-Type", "image/x-icon"); //todo - this properly
-      response.setHeader("Content-Length", "${filedata.length}");
+      response.headers.add(HttpHeaders.CONTENT_LENGTH, "${filedata.length}");
       //TODO: add other headers
       response.outputStream.write(filedata);
       completer.complete(data);

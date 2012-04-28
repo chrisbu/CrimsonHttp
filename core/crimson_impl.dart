@@ -8,7 +8,18 @@
 
 class SessionImpl implements Session {
   
-  Map<String, Object> _internalList;
+  SessionImpl():
+      _internalList = new Map<String,Object>()
+  {
+    print("Created session object");
+    
+  }
+  
+  void addOrReplace(String key, String value) {
+   _internalList[key] = value; 
+  }
+  
+  final Map<String, Object> _internalList;
   
   bool containsValue(Object value) => _internalList.containsValue(value);
   
@@ -16,7 +27,7 @@ class SessionImpl implements Session {
   
   Object operator[](String key) => _internalList[key];
   
-  void operator[]=(String key, Object value) {
+  void operator[]=(String key, String value) {
     _internalList[key] = value;
   }
   

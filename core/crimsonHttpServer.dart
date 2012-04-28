@@ -16,7 +16,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
   {
      //setup the error and request handlers
     _httpServer.onError = _httpErrorHandler;
-    _httpServer.onRequest = _onRequestHandler;    
+    _httpServer.defaultRequestHandler = _onRequestHandler;    
   }
   
   /// Start listening on the [host] and [port] provided.

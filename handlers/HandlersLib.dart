@@ -1,5 +1,5 @@
 #library("crimson:handlers");
-#import("../core/crimson.dart");
+#import("../core/CrimsonLib.dart");
 #import('../../log4dart/LogLib.dart');
 #import('../../dart-crypto-lib/src/md5.dart');
 #import("dart:io");

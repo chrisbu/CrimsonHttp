@@ -4,23 +4,6 @@
 // website: 
 
 
-#library("crimson:core");
-
-#import('../../log4dart/LogLib.dart');
-#import("dart:io");
-#import("dart:uri");
-#import("dart:isolate", prefix:"isolate");
-#source('crimson_impl.dart');
-#source('crimson_utils.dart');
-#source('crimsonPrivate.dart');
-#source('crimsonHttpServer.dart');
-#source('crimsonModule.dart');
-
-
-
-//#source('endpoints/favicon.dart');
-//#source('endpoints/staticFile.dart');
-//#source('filters/cookieSession.dart');
 
 
 /// Crimson is a set of HTTP middleware for Dart, loosely based upon 
@@ -189,5 +172,7 @@ class CrimsonHttpException extends HttpException {
 }
 
 interface Session extends Map<String, Object> default SessionImpl {
+  Session();
   
+  void addOrReplace(String key, Object value);
 }

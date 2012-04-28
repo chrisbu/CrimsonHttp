@@ -58,10 +58,10 @@ class CookieSession implements CrimsonFilter {
     //TODO - CJB: Fix this - it's fragile.
     logger.debug("in _getSession");
     //tempcookie takes precdence, as it's been added.
-    String cookieHeader = req.headers["tempcookie"];
+    String cookieHeader = req.headers.value("tempcookie");
     if (cookieHeader == null) {
       //otherwise, look for a real cookie header.
-      cookieHeader = req.headers["cookie"];
+      cookieHeader = req.headers.value("cookie");
       if (cookieHeader != null) {
         logger.debug("found real cookie header: " + cookieHeader);
       }
@@ -111,7 +111,7 @@ class CookieSession implements CrimsonFilter {
       
       //is there an existing cookie header? 
       //if so, re-use the session cookie id...
-      String cookieHeader = req.headers["cookie"];
+      String cookieHeader = req.headers.value("cookie");
       if (cookieHeader != null) {
         sessionid = _extractSessionCookieId(cookieHeader);
       }
@@ -130,14 +130,14 @@ class CookieSession implements CrimsonFilter {
 
       //add a new session cookie.
       //no expiry means it will go when the browser session ends.
-      res.setHeader("Set-Cookie","${SESSION_COOKIE}=${sessionid}; Path=/;");
+      res.headers.add("Set-Cookie","${SESSION_COOKIE}=${sessionid}; Path=/;");
       
       //add it into the request, too, as this is used later by the getSession() 
       //on the first pass, and it should take precedence over the cookie on the request.
-      //TODO: change the cookie ID on the request. 
-      req.headers.putIfAbsent("tempcookie", () => "${SESSION_COOKIE}=${sessionid}; Path=/;");
-      //create somewhere to store stuff
-      _sessions[sessionid] = new Map<String,Object>();
+      //TODO: change the cookie ID on the request.
+      res.headers.set("tempcookie", "${SESSION_COOKIE}=${sessionid}; Path=/;");
+      //create somewhere to store stuff and add to the list of sessions
+      _sessions[sessionid] = session = new Session(); 
         
       //also store the session id in the session
       //this allows callers to get the session id.
@@ -152,13 +152,11 @@ class CookieSession implements CrimsonFilter {
       logger.debug("there is already a session cookie");
     } 
 
-    
-
     //add the time the last accessed the session (ie, now).
-    session = _getSession(req);
+    logger.debug("session is null?=${session==null}");
     session["last-accessed"] = new Date.now(); 
       
-    if (req.headers.containsKey("cookie")) {
+    if (req.headers.value("cookie") != null) {
       logger.debug("Header: cookie=${req.headers['cookie']}");
     }
     

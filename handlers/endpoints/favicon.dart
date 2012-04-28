@@ -32,9 +32,9 @@ class Favicon implements CrimsonEndpoint {
     
     //otherwise, this request is for the favicon.
     onSuccess(List filedata) {
-      response.setHeader("Content-Type", "image/x-icon");
-      response.setHeader("Content-Length", "${filedata.length}");
-      response.setHeader("Cache-Control", "public, max-age=86400"); //1 day
+      response.headers.add(HttpHeaders.CONTENT_TYPE, "image/x-icon");
+      response.headers.add(HttpHeaders.CONTENT_LENGTH, "${filedata.length}");
+      response.headers.add(HttpHeaders.CACHE_CONTROL, "public, max-age=86400"); //1 day
       response.outputStream.write(filedata);
       completer.complete(data);
     };
