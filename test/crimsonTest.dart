@@ -13,12 +13,17 @@ main() {
                     .addEndpoint(new Favicon("./test/favicon.ico"))                   
                     .addFilter(new CookieSession())
                     .addEndpoint(new Route("/hello","GET",sayHello))
+                    .addEndpoint(new Route.withMatcher(matcherFunction,"helloMatcher",sayHello))
                     .addEndpoint(new StaticFile("./test/public"));
   
 
   server.modules["*"] = sampleModule;
    
   server.listen("127.0.0.1", 8082);
+}
+
+bool matcherFunction(HttpRequest req) {
+  return req.path.endsWith("matcher");
 }
 
 Future sayHello(HttpRequest req,HttpResponse res,var data) {

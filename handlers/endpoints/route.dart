@@ -4,6 +4,8 @@ class Route implements CrimsonEndpoint {
   var _method;
   var _handler;
   var logger;
+  var _routeItentifier;
+  var _matcher;  
   CrimsonHttpServer server;
  
   ///Creates the route, which will match the path and method, and pass the 
@@ -18,10 +20,31 @@ class Route implements CrimsonEndpoint {
     
   }
   
+  /// Allow matching with a custom _matcher function, which should return true or false.
+  /// The [routeIdentifier] is provided to provide a way to log
+  Route.withMatcher(bool this._matcher(HttpRequest req), String _routeIdentifier, Future handler(HttpRequest, HttpResponse, CrimsonData)) {
+    _name = "ROUTE:matcher:${_routeIdentifier}";
+    logger = LoggerFactory.getLogger(_name);
+    _handler = handler;
+  }
+  
   Future<CrimsonData> handle(HttpRequest req, HttpResponse res, CrimsonData data) {
     logger.debug("Request:${req.method}:${req.path} - Handler:${this._method}:${this._path}");
-    if (req.path == this._path && req.method == this._method) {
-      logger.debug("Routable handler for request:${req.method}:${req.path}");
+    bool isMatched = false;
+    if (this._matcher != null) {
+      if (_matcher(req)) {
+        isMatched = true;
+      }
+    }
+    else if (req.path == this._path && req.method == this._method) {
+      isMatched = true;
+    }
+    else {
+      //TODO: Add regex matching
+    }
+      
+    if (isMatched) {
+      logger.debug("Routable handler for request: ${_name}");
       Completer completer = new Completer();
       
       Future handlerComplete = _handler(req,res,data);
