@@ -10,10 +10,10 @@ main() {
   
   CrimsonModule sampleModule = new CrimsonModule(server);
   sampleModule.handlers
-                    .addEndpoint(new Favicon("./favicon.ico"))                   
+                    .addEndpoint(new Favicon("./test/favicon.ico"))                   
                     .addFilter(new CookieSession())
                     .addEndpoint(new Route("/hello","GET",sayHello))
-                    .addEndpoint(new StaticFile("./public"));
+                    .addEndpoint(new StaticFile("./test/public"));
   
 
   server.modules["*"] = sampleModule;
