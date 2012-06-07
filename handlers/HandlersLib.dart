@@ -8,3 +8,4 @@
 #source("endpoints/staticFile.dart");
 #source("filters/cookieSession.dart");
 #source("endpoints/route.dart");
+#source("endpoints/controllerRoute.dart");
