@@ -46,19 +46,14 @@ class StaticFile implements CrimsonEndpoint {
   _loadFromPath(String path, success(List data), onNotFound(), fail(exception)) {
     File file = new File(path);
     
-    //file.fullPath((String fullPath) => print(fullPath));
+    Future<bool> existFuture = file.exists();
     
-    file.onError = (Exception error) {
-      logger.debug("${path} doesn't exist: ${error}");
-      fail(error);
-    };
-    
-    logger.debug("trying to open file: ${path}");
-    file.exists((bool exists) {
+    existFuture.then((exists) {
       logger.debug("in exists callback: ${path}, ${exists}");
       if (exists) {
         logger.debug("${path} exists, so reading");
-        file.readAsBytes( (List buffer) {
+        Future<List<int>> bytesFuture = file.readAsBytes();
+        bytesFuture.then((List<int> buffer) {
           logger.debug("successfully read ${path}");
           success(buffer);
         });
@@ -66,8 +61,15 @@ class StaticFile implements CrimsonEndpoint {
       else {
         logger.debug("${path} doesn't exist");
         onNotFound();
-      }
+      }  
     });
+    
+    existFuture.handleException((Exception error) {
+      logger.debug("${path} doesn't exist: ${error}");
+      fail(error);
+    });
+    
+    logger.debug("trying to open file: ${path}");
   }
   
   final String NAME = "StaticFile";
