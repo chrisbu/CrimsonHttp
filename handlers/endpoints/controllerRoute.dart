@@ -15,7 +15,7 @@ class ControllerRoute implements CrimsonEndpoint {
   Future<CrimsonData> handle(HttpRequest req, HttpResponse res, CrimsonData data) {
     logger.debug("Request:${req.method}:${req.path} - Handler:${this._path}");
     bool isMatched = false;
-    if (req.path == this._path) {
+    if (req.path.startsWith(this._path)) {
       isMatched = true;
     } else {
       //TODO: Add regex matching
