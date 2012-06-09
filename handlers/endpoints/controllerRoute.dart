@@ -9,7 +9,8 @@ class ControllerRoute implements CrimsonEndpoint {
   ControllerRoute(String this._path, AppController controller) {
     _name = "ROUTE:${_path}";
     logger = LoggerFactory.getLogger(_name);
-    _controller = controller;    
+    _controller = controller;
+    controller.route = _path;
   }
   
   Future<CrimsonData> handle(HttpRequest req, HttpResponse res, CrimsonData data) {
@@ -56,6 +57,7 @@ class ControllerRoute implements CrimsonEndpoint {
 interface AppController {
   
   /** A base method that handles a http requests. */
-  Future handler(HttpRequest, HttpResponse, CrimsonData);  
-
+  Future handler(HttpRequest, HttpResponse, CrimsonData);
+  /** Path to the controller a knowledge about given route path. */
+  String set route(String path);
 }
