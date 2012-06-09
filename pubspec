@@ -1,3 +1,0 @@
-dependencies:
-	log4dart:
-		git: git://github.com/zhygr/log4dart.git
