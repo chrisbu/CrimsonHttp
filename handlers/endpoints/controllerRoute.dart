@@ -1,7 +1,7 @@
 class ControllerRoute implements CrimsonEndpoint {  
   var _name;
   var _path;
-  var _controller;
+  AppController _controller;
   var logger;
   CrimsonHttpServer server;
   
@@ -45,6 +45,7 @@ class ControllerRoute implements CrimsonEndpoint {
   }
   
   onSuccess(res, completer, data) {
+    print("we successfully processed a route: ${_controller.route}");
     data["SUCCESS"] = true;
     res.outputStream.close();
     completer.complete(data);

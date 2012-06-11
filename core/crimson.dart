@@ -153,7 +153,113 @@ interface CrimsonEndpoint extends CrimsonHandler {
   
 }
 
-interface CrimsonData extends Map {
+interface CrimsonData<K, V> extends Map<K, V>
+                            default _CrimsonData<K, V> {
+   /** Constructor with default implementation */                           
+   CrimsonData();
+  
+}
+
+/** An default implementation */
+class _CrimsonData<K, V> implements CrimsonData {
+  /** a delegate that implements a given methods */
+  Map<K, V> _delegate;
+  
+  _CrimsonData() {
+    _delegate = new Map();  
+  }
+  
+  /**
+   * Returns whether this map contains the given [value].
+   */
+  bool containsValue(V value) {
+    return _delegate.containsValue(value);
+  }
+
+  /**
+   * Returns whether this map contains the given [key].
+   */
+  bool containsKey(K key) {
+    return _delegate.containsKey(key);
+  }
+
+  /**
+   * Returns the value for the given [key] or null if [key] is not
+   * in the map. Because null values are supported, one should either
+   * use containsKey to distinguish between an absent key and a null
+   * value, or use the [putIfAbsent] method.
+   */
+  V operator [](K key) {
+    return _delegate[key];
+  }
+
+  /**
+   * Associates the [key] with the given [value].
+   */
+  void operator []=(K key, V value) {
+    _delegate[key] = value;
+  }
+
+  /**
+   * If [key] is not associated to a value, calls [ifAbsent] and
+   * updates the map by mapping [key] to the value returned by
+   * [ifAbsent]. Returns the value in the map.
+   */
+  V putIfAbsent(K key, V ifAbsent()) {
+    _delegate.putIfAbsent(key, ifAbsent);
+  }
+
+  /**
+   * Removes the association for the given [key]. Returns the value for
+   * [key] in the map or null if [key] is not in the map. Note that values
+   * can be null and a returned null value does not always imply that the
+   * key is absent.
+   */
+  V remove(K key) {
+    _delegate.remove(key);
+  }
+
+  /**
+   * Removes all pairs from the map.
+   */
+  void clear() {
+    _delegate.clear();
+  }
+
+  /**
+   * Applies [f] to each {key, value} pair of the map.
+   */
+  void forEach(void f(K key, V value)) {
+    _delegate.forEach(f);
+  }
+
+  /**
+   * Returns a collection containing all the keys in the map.
+   */
+  Collection<K> getKeys() { 
+    return _delegate.getKeys();
+  }
+
+  /**
+   * Returns a collection containing all the values in the map.
+   */
+  Collection<V> getValues() { 
+    return _delegate.getValues();
+  }
+
+  /**
+   * The number of {key, value} pairs in the map.
+   */
+  int get length() {
+    return _delegate.length;
+  }
+
+  /**
+   * Returns true if there is no {key, value} pair in the map.
+   */
+  bool isEmpty() {
+    return _delegate.isEmpty();    
+  }
   
 }
 
