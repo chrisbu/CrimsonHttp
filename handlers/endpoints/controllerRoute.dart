@@ -1,6 +1,6 @@
 class ControllerRoute implements CrimsonEndpoint {  
-  var _name;
-  var _path;
+  String _name;
+  String _path;
   AppController _controller;
   var logger;
   CrimsonHttpServer server;
@@ -60,5 +60,7 @@ interface AppController {
   /** A base method that handles a http requests. */
   Future handler(HttpRequest, HttpResponse, CrimsonData);
   /** Path to the controller a knowledge about given route path. */
-  String set route(String path);
+  void set route(String path);
+  
+  String get route();
 }
