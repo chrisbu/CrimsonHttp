@@ -18,10 +18,7 @@ class ControllerRoute implements CrimsonEndpoint {
     bool isMatched = false;
     if (req.path.startsWith(this._path)) {
       isMatched = true;
-    } else {
-      //TODO: Add regex matching
     }
-      
     if (isMatched) {
       logger.debug("Routable handler for request: ${_name}");
       Completer completer = new Completer();
