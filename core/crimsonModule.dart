@@ -23,7 +23,7 @@ class CrimsonModule  {
       if (data["SUCCESS"] != true) {
         if (handlerIterator.hasNext()) {
           CrimsonHandler handler = handlerIterator.next();
-          print("trying handler: ${handler.NAME}");
+          logger.debug("trying handler: ${handler.NAME}");
           Future<CrimsonData> onHandled = handler.handle(req,res,data);
         
           //it is valid for a handler to return null, when they are not even 
