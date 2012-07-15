@@ -28,7 +28,10 @@ class ControllerRoute implements CrimsonEndpoint {
       if (handlerComplete != null) {
         logger.debug("handling");
         handlerComplete.then((completeData) => onSuccess(res, completer, data));
-        handlerComplete.handleException((error) => completer.completeException(error));
+        handlerComplete.handleException((error) { 
+          completer.completeException(error);
+          return true;
+        });
       }
       else {
         onSuccess(res, completer,data);

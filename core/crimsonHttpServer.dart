@@ -63,6 +63,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
         handled.handleException((error) {
           res.outputStream.close();
           _httpErrorHandler(error);
+          return true; //this consider a given error to be handled.
         });
       }
       catch (var ex, var stack) {

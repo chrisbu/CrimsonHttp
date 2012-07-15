@@ -49,7 +49,7 @@ class CrimsonModule  {
                 print(ex);
                 print(stack);
               }
-              
+              return true;
             });
           }
           else {
