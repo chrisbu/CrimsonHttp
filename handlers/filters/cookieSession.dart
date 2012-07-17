@@ -121,7 +121,7 @@ class CookieSession implements CrimsonFilter {
         //generate a new ID.
         
         //this is a toy - don't use for real!
-        var md5 = new Md5();
+        var md5 = new MD5();
         String s = (Math.random() * Clock.now()).toInt().toString();
         md5.update(s.charCodes());
         var hash = md5.digest();
