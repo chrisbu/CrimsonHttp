@@ -22,7 +22,6 @@ class ControllerRoute implements CrimsonEndpoint {
     if (isMatched) {
       logger.debug("Routable handler for request: ${_name}");
       Completer completer = new Completer();
-      
       Future handlerComplete = _controller.handler(req,res,data);
       
       if (handlerComplete != null) {
@@ -47,7 +46,6 @@ class ControllerRoute implements CrimsonEndpoint {
   onSuccess(res, completer, data) {
     print("we successfully processed a route: ${_controller.route}");
     data["SUCCESS"] = true;
-    res.outputStream.close();
     completer.complete(data);
   }
   

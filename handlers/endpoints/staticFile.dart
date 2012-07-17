@@ -67,6 +67,7 @@ class StaticFile implements CrimsonEndpoint {
     existFuture.handleException((Exception error) {
       logger.debug("${path} doesn't exist: ${error}");
       fail(error);
+      return true;
     });
     
     logger.debug("trying to open file: ${path}");

@@ -32,12 +32,13 @@ class CrimsonModule  {
           // for index.html.  In this case, just go to the next
           // handler/
           if (onHandled != null) { 
-            
             onHandled.then((result) {
               logger.debug("handler handled.");
               if (result["SUCCESS"] != true) {
                 logger.debug("handler handled = false.");
                 handleNext(); //recurse
+              } else {
+                completer.complete("handled");
               }
             });  
             onHandled.handleException((error) {
@@ -55,8 +56,7 @@ class CrimsonModule  {
           else {
             logger.debug("handler returned null - trying next");
             handleNext(); //recurse
-          }       
-          
+          }         
         }
         else {
           completer.complete("all handled");    
@@ -64,7 +64,7 @@ class CrimsonModule  {
       }
       else {
         logger.info("Success=true");
-        res.outputStream.close();
+        completer.complete("handled");
       }
     }
     

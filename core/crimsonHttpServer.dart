@@ -2,8 +2,7 @@
 class _CrimsonHttpServer implements CrimsonHttpServer {
   
   /// Contains the [Logger]
-  Logger logger;
-  
+  Logger logger;  
   
   /// Constructor
   _CrimsonHttpServer([HttpServer httpServer]) :
@@ -26,9 +25,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
     // start the server listening
     _httpServer.listen(host, port);
     print("Listening on ${host}:${port}");
-  }
-  
-  
+  } 
   
   /// This is the core of method of [CrimsonHttpServer]
   /// It first loops through each of the [filters] in turn, calling handle
@@ -58,7 +55,12 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
       try {
         Future<CrimsonData> handled = module.handle(req,res);        
         handled.then((result) {
-          res.outputStream.close();
+          try {
+            res.outputStream.close();
+          }
+          catch (var ex, var stack) {
+            print("${ex}, ${stack}");
+          }
         });
         handled.handleException((error) {
           res.outputStream.close();
@@ -74,30 +76,13 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
       logger.debug("404, not found");
       res.statusCode = HttpStatus.NOT_FOUND;
       res.outputStream.close();
-    }
-    
-  }
-  
+    }    
+  }  
   
   _httpErrorHandler(Exception error) {
+    print("we invocked http error handler");
     this.logger.error(error.toString());
-    //CrimsonHttpException ex = new CrimsonHttpException(HttpStatus.INTERNAL_SERVER_ERROR, error);
-    //_crimsonErrorHandler(ex, null, null);
-  }
-  
-//  _crimsonErrorHandler(CrimsonHttpException error, HttpRequest req, HttpResponse res) {
-//    res.statusCode = error.status;
-//    res.setHeader("Content-Type", "text/plain");
-//    res.outputStream.writeString("CrimsonHttp: Error"
-//                                 "${error}"
-//                                 "Method: ${req.method}: ${req.uri}");
-//    res.outputStream.close();
-//    //TODO: If an error handler filter has been registered, then use that.
-//    //Might be better to have an errorHandler collection in the same
-//    //way that we have filters and endpoints.
-//  }
-  
-  
+  }  
   
   LinkedHashMap<String,CrimsonModule> get modules() => _modules;
   
