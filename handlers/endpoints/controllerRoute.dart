@@ -28,6 +28,7 @@ class ControllerRoute implements CrimsonEndpoint {
         logger.debug("handling");
         handlerComplete.then((completeData) => onSuccess(res, completer, data));
         handlerComplete.handleException((error) { 
+          print("have error in controller: ${error}");
           completer.completeException(error);
           return true;
         });
