@@ -45,7 +45,7 @@ class SessionImpl implements Session {
   
   Collection getValues() => _internalList.getValues();
   
-  int get length() => _internalList.length;
+  int get length => _internalList.length;
   
   bool isEmpty() => _internalList.isEmpty();
 }

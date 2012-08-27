@@ -250,9 +250,7 @@ class _CrimsonData<K, V> implements CrimsonData {
   /**
    * The number of {key, value} pairs in the map.
    */
-  int get length() {
-    return _delegate.length;
-  }
+  int get length => _delegate.length;
 
   /**
    * Returns true if there is no {key, value} pair in the map.

@@ -4,7 +4,7 @@ class CrimsonModule  {
   var logger;
   
   CrimsonHandlerList<CrimsonHandler> _handlers;
-  CrimsonHandlerList<CrimsonHandler> get handlers() => _handlers;
+  CrimsonHandlerList<CrimsonHandler> get handlers => _handlers;
   
   CrimsonModule(this._server)   {
     logger = LoggerFactory.getLogger("CrimsonModule");

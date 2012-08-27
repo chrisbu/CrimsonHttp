@@ -84,7 +84,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
     this.logger.error(error.toString());
   }  
   
-  LinkedHashMap<String,CrimsonModule> get modules() => _modules;
+  LinkedHashMap<String,CrimsonModule> get modules => _modules;
   
   final HttpServer _httpServer;
   final LinkedHashMap<String, CrimsonModule> _modules;  

@@ -71,6 +71,6 @@ class Route implements CrimsonEndpoint {
     completer.complete(data);
   }
   
-  String get NAME() => _name;
+  String get NAME => _name;
 
 }
