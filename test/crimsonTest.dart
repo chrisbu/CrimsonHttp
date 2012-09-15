@@ -1,17 +1,16 @@
 #library('crimsonTest');
-#import('../../log4dart/log4dart.dart');
-#import("../core/CrimsonLib.dart");
-#import("../handlers/HandlersLib.dart");
 #import("dart:io");
 #import("dart:utf");
+
+#import('../third_party/log4dart/log4dart.dart');
+#import("../core/CrimsonLib.dart");
+#import("../handlers/HandlersLib.dart");
 
 void main() {
   CrimsonHttpServer server = new CrimsonHttpServer();
   
   CrimsonModule sampleModule = new CrimsonModule(server);
   sampleModule.handlers
-                    //.addEndpoint(new Favicon("./test/favicon.ico"))                   
-                    //.addEndpoint(new Route("/hello","GET",sayHello))
                     //.addEndpoint(new Route.withMatcher(matcherFunction,"helloMatcher",sayHello))
                     .addEndpoint(new Route("/buckshotbin","GET", getTemplateData))
                     .addEndpoint(new Route("/buckshotbin","POST", setTemplateData))
