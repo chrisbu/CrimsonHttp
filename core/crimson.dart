@@ -112,7 +112,7 @@ interface CrimsonHandler {
   /// The handler can use this reference to access things like logger etc...
   CrimsonHttpServer server;
   
-  Future<CrimsonData> handle(HttpRequest req, HttpResponse res, CrimsonData data);
+  Future<Map> handle(HttpRequest req, HttpResponse res, Map data);
 }
 
 
@@ -150,10 +150,6 @@ interface CrimsonEndpoint extends CrimsonHandler {
   /// optional [success] callback when a handler successfully handles 
   /// the request.
    
-  
-}
-
-interface CrimsonData extends Map {
   
 }
 

@@ -1,0 +1,6 @@
+name: log4dart
+version: 1.0.0 
+description: >
+  Logging Facade for Dart or (log4dart) serves as a simple facade or abstraction 
+  for various logging frameworks, it offers powerful features such as multiple 
+  appenders, diagnostic context and configurable formatting.  

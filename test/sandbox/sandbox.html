@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Buckshot UI - Sandbox</title>
+  </head>
+  <body style='padding:0px;margin:0px'>
+	<div id="BuckshotHost"></div>
+
+<!--
+Begin Buckshot Templates
+-->
+
+<script id='main' type='application/xml'>
+<dockpanel halign='stretch' valign='stretch'>
+  <resourcecollection>
+    <color key="buckshotBlue" value="#165284"></color>
+   
+    <styletemplate key="iotext">
+       <setters>
+          <setter property="margin" value="15,0,0,0" />
+          <setter property="fontFamily" value="Arial" />
+          <setter property="fontSize" value="20" />
+       </setters>
+    </styletemplate>
+    <styletemplate key='headerText'>
+       <setters>
+          <setter property='fontSize' value='18' />
+          <setter property='fontFamily' value='Arial' />
+          <setter property='margin' value='15,0,0,0' />
+       </setters>
+    </styletemplate>
+    <styletemplate key='defaultText'>
+       <setters>
+          <setter property='fontSize' value='14' />
+          <setter property='fontFamily' value='Arial' />
+          <setter property='margin' value='0,3' />
+       </setters>
+    </styletemplate>
+  </resourcecollection>
+
+  <border padding='5' dockpanel.dock='top' background='{resource buckshotBlue}'>
+    <stack orientation='horizontal'>
+       <hyperlink valign='center' navigateto='http://www.buckshotui.org/'>
+	       <image width='35' sourceuri='apps/calculator/resources/buckshot_logo.png' alt='Buckshot Logo' />
+	       </hyperlink>
+       <textblock margin='0,0,0,5' valign='center' foreground='White' fontfamily='Arial' text='Buckshot Sandbox' />
+       <textblock margin='0,0,0,5' valign='bottom' foreground='White' fontsize='10' fontfamily='Arial' text='alpha' />
+    </stack>
+  </border>
+
+  <stack margin='5' dockpanel.dock='left' minWidth='250'>
+    <textblock maxwidth='250' fontfamily='Arial' text="Select a sample below, or create your own in the text area."/>
+    <border valign='stretch' halign='stretch' background='White' borderthickness='1' bordercolor='LightGray' padding='5' margin='0,5,0,0'>
+      <stack>       
+     	<treeview on.treenodeselected='selection_handler'>
+ 		 <treenode header='App Demos' childvisibility='visible'>
+            <treenode header='Calculator' tag='app.calc' />
+            <treenode header='Simple Todo List' tag='app.todo' />
+	     </treenode>
+	     <treenode header='Elements' tag=''>
+	     	<treenode header='TextBlock' tag='textblock' />
+	     	<treenode header='Stack' tag='stack' />
+	     	<treenode header='Border' tag='border' />
+	     	<treenode header='Grid' tag='grid' />
+	     	<treenode header='RawHtml' tag='rawhtml' />
+	     	<treenode header='LayoutCanvas' tag='layoutcanvas' />
+	     	<treenode header='3D Transformations' tag='transforms' />
+	     </treenode>
+	     <treenode header='Controls' tag=''>
+	        <treenode header='TabControl' tag='tabcontrol' />
+	     	<treenode header='TreeView' tag='treeview' />
+	     	<treenode header='DockPanel' tag='dockpanel' />
+	     	<treenode header='ListBox' tag='listbox' />
+	     	<treenode header='ModalDialog' tag='modaldialog' />
+	     	<treenode header='Popup' tag='popup' />
+	     	<treenode header='DropDownList' tag='dropdownlist' />
+	     	<treenode header='TextBox' tag='textbox' />
+	     	<treenode header='Slider' tag='slider' />
+	     	<treenode header='Button' tag='button' />
+	     	<treenode header='RadioButton' tag='radiobutton' />
+	     	<treenode header='CheckBox' tag='checkbox' />
+	     	<treenode header='Hyperlink' tag='hyperlink' />
+	     </treenode>
+	     <treenode header='Binding Demos' tag=''>
+	     	<treenode header='Resource Binding' tag='resources' />
+	     	<treenode header='Element Binding' tag='elementbinding' />
+	     	<treenode header='Data Binding' tag='databinding' />
+	     	<treenode header='Binding To Collections' tag='collections' />
+	     </treenode>
+	     <treenode header='Media Extensions' tag=''>
+	     	<treenode header='YouTube' tag='youtube' />
+	     	<treenode header='Hulu' tag='hulu' />
+	     	<treenode header='Vimeo' tag='vimeo' />
+	     	<treenode header='FunnyOrDie' tag='funnyordie' />
+	     </treenode>
+	  	</treeview>  
+      </stack>
+    </border>
+  </stack>
+  <dockpanel margin='5' dockpanel.dock='left' filllast='true' grid.column='1'>
+  	<border dockpanel.dock='top' padding='5' background='White' content='{data renderedOutput}' margin="5" minheight='200' maxheight='600' 
+    borderThickness="1" verticalscrollenabled='true' borderColor="LightGray" />
+         
+    <stack dockpanel.dock='top' margin='0,0,0,5' orientation="horizontal">
+       <button on.click='refresh_handler' content="Generate Output"></button>
+       <button on.click='clearAll_handler' margin="0,0,0,5" content="Clear All"></button>
+       <hyperlink margin="0,0,0,5" content=" google" navigateto='http://google.com/' />
+    </stack>
+    
+    <textarea dockpanel.dock='bottom' minwidth='800' minheight='300' margin='0,10,0,5'
+	    placeholder="Type something here or select one of the samples to the left." 
+	    spellcheck="false" 
+	  	text='{data templateText, mode=twoway}' />
+    
+  </dockpanel>
+</dockpanel>
+</script>
+
+<script id='textbox' type='application/xml'>
+<stack minheight='100'>
+   <textblock style='{resource headerText}'>
+   A TextBox allows you to input some text.
+   </textblock>
+
+   <textbox width='300' margin='0,5' name='tbDemo' placeholder='type something...' />
+
+   <stack orientation='horizontal'>
+      <textblock style='{resource defaultText}' text='You wrote:' />
+      <textblock style='{resource defaultText}' text='{element tbDemo.text}' />
+   </stack>
+</stack>
+</script>
+
+<script id='rawhtml' type='application/xml'>
+<rawhtml htmlstring="<div style='font-size:32px'>Hello World!</div>"/>
+</script>
+
+<script id='treeview' type='application/xml'>
+<stack>
+   <treeview on.treenodeselected='demotreeview_selection' borderthickness='1' bordercolor='Black' >
+      <treenode childvisibility='visible' header='Tree Node L1A' >
+         <treenode header='Tree Node L2A (custom icon)' >
+            <fileicon>
+               <border width='20' height='20' cornerradius='20' background='Orange' />
+            </fileicon>
+         </treenode>
+         <treenode childvisibility='visible' header='Tree Node L2B'>
+            <treenode header='Tree Node L3A' />
+            <treenode header='Tree Node L3B' />
+            <treenode header='Tree Node L3C' />
+         </treenode>
+         <treenode header='Tree Node L2C' />
+      </treenode>
+      <treenode header='Tree Node L1B' />
+   </treeview>
+   
+   <stack orientation='horizontal'>
+      <textblock style='{resource defaultText}' text='Your selection:' margin='0,10,0,0' />
+      <textblock background='WhiteSmoke' style='{resource defaultText}' text='{data demoTreeNodeSelected}' />
+   </stack>
+</stack>
+</script>
+
+<script id='dockpanel' type='application/xml'>
+<stack>
+   <resourcecollection>
+      <styletemplate key='borderStyle'>
+         <setters>
+            <setter property='borderThickness' value='1' />
+            <setter property='borderColor' value='Black' />
+            <setter property='background' value='WhiteSmoke' />
+         </setters>
+      </styletemplate>
+      <styletemplate key='textStyle'>
+         <setters>
+            <setter property='vAlign' value='center' />
+            <setter property='hAlign' value='center' />
+            <setter property='background' value='WhiteSmoke' />
+         </setters>
+      </styletemplate>
+   </resourcecollection>
+   <textblock style='{resource headerText}' text='DockPanel Snaps Content To Edges' />
+   <dockpanel name='dockpanelDemo' fillLast='false' width='250' height='250' background='Khaki'>
+      <border background='LightGreen' cornerradius='7' padding='3' borderthickness='1' bordercolor='Black' name='btnDock'>
+         <textblock style='{resource defaultText}' halign='center' valign='center' text="{data dockText}" />
+      </border>
+   </dockpanel>
+   <stack orientation='horizontal'>
+      <textblock style='{resource defaultText}' text='Click One:' />
+      <button on.click='dockpanel_click' content='Left'/>
+      <button on.click='dockpanel_click' content='Top'/>
+      <button on.click='dockpanel_click' content='Right'/>
+      <button on.click='dockpanel_click' content='Bottom'/>
+   </stack>
+   
+   <textblock style='{resource headerText}' text='Nested Content In DockPanel' />
+   <dockpanel fillLast='true' width='250' height='250' background='Orange'>
+      <border dockpanel.dock='left' style='{resource borderStyle}'>
+         <textblock text='#1' style='{resource textStyle}' />
+      </border>
+      <border dockpanel.dock='top' style='{resource borderStyle}'>
+         <textblock text='#2' style='{resource textStyle}' />
+      </border>
+      <border dockpanel.dock='right' style='{resource borderStyle}'>
+         <textblock text='#3' style='{resource textStyle}' />
+      </border>
+      <border dockpanel.dock='bottom' style='{resource borderStyle}'>
+         <textblock text='#4' style='{resource textStyle}' />
+      </border>
+      <border dockpanel.dock='left' style='{resource borderStyle}'>
+         <textblock text='#5' style='{resource textStyle}' />
+      </border>
+      <border dockpanel.dock='top' style='{resource borderStyle}'>
+         <textblock text='#6' style='{resource textStyle}' />
+      </border>
+      <border dockpanel.dock='right' style='{resource borderStyle}'>
+         <textblock text='#7' style='{resource textStyle}' />
+      </border>
+      <border dockpanel.dock='bottom' style='{resource borderStyle}'>
+        <textblock text='#8' style='{resource textStyle}' />
+      </border>
+      <border dockpanel.dock='left' style='{resource borderStyle}'>
+         <textblock text='#9' style='{resource textStyle}' />
+      </border>
+      <border dockpanel.dock='top' style='{resource borderStyle}'>
+         <textblock text='#10' style='{resource textStyle}' />
+      </border>
+      <border dockpanel.dock='right' style='{resource borderStyle}'>
+         <textblock text='#11' style='{resource textStyle}' />
+      </border>
+      <border>
+         <textblock style='{resource defaultText}' fontsize='20' valign='center' halign='center' text='Neat!' />
+      </border>
+   </dockpanel>
+</stack>
+</script>
+
+<script id='image' type='application/xml'>
+<stack orientation='horizontal'>
+  <textblock valign='center' text='Like this logo for Buckshot?' />
+  <image alt="Buckshot Logo Candidate" sourceuri="http://www.lucastudios.com/img/lucaui_logo_candidate2.png" />
+</stack>
+</script>
+
+<script id='youtube' type='application/xml'>
+<stack>
+    <textblock fontfamily="arial" text="About Buckshot Templates" />
+    <youtube margin="10" videoid="LOacOkmd9FI" width="400" height="300" />
+</stack> 
+</script>
+
+<script id='hulu' type='application/xml'>
+<hulu margin="10" width="400" height="300" videoID="QRNTv9APf02C6J_xFpY0Dg" />
+</script>
+
+<script id='vimeo' type='application/xml'>
+<stack>
+    <textblock fontfamily="arial" text="Seth Ladd's 'Intro To Box2D'" />>  
+    <vimeo videoid="32214850" margin="10" width="400" height="300" />
+</stack>
+</script>
+
+<script id='funnyordie' type='application/xml'>
+<!-- FunnyOrDie element is part of the media extension library for Buckshot. -->
+<stack>
+    <textblock fontfamily="arial" text='Darth Vader Sells Out' />
+    <funnyordie videoid="1cf04006d2" margin="10" width="400" height="300" />
+</stack>
+</script>
+
+
+<script id='error' type='application/xml'>
+   <border halign='center' maxwidth='650' borderColor="Red" borderThickness="3" padding="5" background="Yellow">
+      <textblock halign='stretch' foreground="Red" text="{data errorMessage}" />
+   </border>
+</script>
+
+<script id='textblock' type='application/xml'>
+<stack>
+   <!-- Inline -->
+   <textblock style='{resource defaultText}' text="Hello World!" />
+
+   <!-- As text node -->
+   <textblock style='{resource defaultText}'>
+      This text is in a node where
+      line breaks are tolerated.
+   </textblock>
+
+   <!-- From data source ('timeStamp' property in view model) -->
+   <textblock style='{resource defaultText}' text='{data timeStamp}' />
+
+   <!-- Other properties -->
+   <textblock fontsize='48' foreground='Green' fontfamily='courier' text='Buckshot!' />
+</stack>
+</script>
+
+<script id='stack' type='application/xml'>
+<stack>
+  <resourcecollection>
+     <styletemplate key='defaultBorder'>
+        <setters>
+         <setter property='width' value='30' />
+         <setter property='height' value='30' />
+         <setter property='margin' value='1' />
+         <setter property='cornerRadius' value='30' />
+        </setters>
+     </styletemplate>
+  </resourcecollection>
+
+  <textblock style='{resource headerText}' text="Vertical Stack" />
+
+  <stack>
+     <border style='{resource defaultBorder}' background="Red" />
+     <border style='{resource defaultBorder}' background="Purple" />
+     <border style='{resource defaultBorder}' background="Orange" />
+  </stack>
+
+  <textblock style='{resource headerText}' text="Horizontal Stack" />
+
+  <stack orientation="horizontal">
+     <border style='{resource defaultBorder}' background="Red" />
+     <border style='{resource defaultBorder}' background="Purple" />
+     <border style='{resource defaultBorder}' background="Orange" />
+  </stack>
+
+  <textblock style='{resource headerText}' text="Cross-axis Alignment" />
+
+  <stack background='LightGreen' width='150'>
+     <border style='{resource defaultBorder}' background="Red" />
+     <border halign='center' style='{resource defaultBorder}' background="Purple" />
+     <border halign='right' style='{resource defaultBorder}' background="Orange" />
+     <border halign='stretch' height='30' cornerradius='30' background="Blue">
+        <textblock foreground='White' valign='center' halign='center' text='Stretch' />
+     </border>
+  </stack>
+
+  <stack margin='0,5' orientation='horizontal' background='LightGreen' height='150'>
+     <border valign='bottom' style='{resource defaultBorder}' background="Red" />
+     <border valign='center' style='{resource defaultBorder}' background="Purple" />
+     <border style='{resource defaultBorder}' background="Orange" />
+     <border valign='stretch' width='55' cornerradius='30' background="Blue">
+        <textblock foreground='White' valign='center' halign='center' text='Stretch' />
+     </border>
+  </stack>
+</stack>
+</script>
+
+<script id='border' type='application/xml'>
+<stack>
+  <resourcecollection>
+    <styletemplate key='bStyle'>
+      <setters>
+        <setter property='borderThickness' value='1'/>
+        <setter property='borderColor' value='Black'/>
+        <setter property='cornerRadius' value='9'/>
+        <setter property='padding' value='10'/>
+        <setter property='margin' value='10'/>
+      </setters>
+    </styletemplate>
+  </resourcecollection>
+
+  <border style='{resource bStyle}' width='165'>
+    <textblock style='{resource defaultText}' halign='stretch'>
+    Borders provide a visible container around another element.
+    </textblock>
+  </border>
+    <border style='{resource bStyle}' width='165'>
+       <stack halign='stretch'>
+          <textblock style='{resource defaultText}' halign='stretch'>
+            They can also approximate circles.
+          </textblock>
+          <stack orientation='horizontal'>
+             <border background='Red' width='20' height='20' cornerradius='10' />
+             <border background='Orange' width='20' height='20' cornerradius='10' />
+             <border background='Green' width='20' height='20' cornerradius='10' />
+             <border background='Blue' width='20' height='20' cornerradius='10' />
+             <border background='Purple' width='20' height='20' cornerradius='10' />
+          </stack>
+       </stack>
+  </border>
+  <border style='{resource bStyle}' background="Green" width="250" height="250">
+    <border style='{resource bStyle}' background="Blue" halign="stretch" valign="stretch">
+      <border style='{resource bStyle}' background="Orange" halign="stretch" valign="stretch">
+        <border style='{resource bStyle}' background="WhiteSmoke" halign="stretch" valign="stretch">
+           <textblock style='{resource defaultText}' halign="center" valign="center" text="Borders are cool!"/>
+        </border>
+      </border>
+    </border>
+  </border>
+</stack>
+</script>
+
+<script id='slider' type='application/xml'>
+<stack>
+   <resourcecollection>
+      <styletemplate key='borderValue'>
+         <setters>
+           <setter property='margin' value='0,0,0,5' />
+           <setter property='padding' value='2' />
+           <setter property='borderThickness' value='2' />
+           <setter property='borderColor' value='Black'/>
+           <setter property='width' value='40'/>
+           <setter property='background' value='WhiteSmoke' />
+         </setters>
+      </styletemplate>
+   </resourcecollection>
+   
+   <textblock style='{resource headerText}'>1-100, Step 1</textblock>
+   <stack margin='10' orientation="horizontal">
+      <slider valign='center' name="myslider" value="50" />
+      <border style='{resource borderValue}'>
+          <textblock style='{resource defaultText}' text="{element myslider.value}" />
+      </border>
+   </stack>
+
+   <textblock style='{resource headerText}'>1-50, Step .5</textblock>
+   <stack margin='10' orientation="horizontal">      
+      <slider valign='center' name="s2" min="1" max="50" value="25" step='.5' />
+      <border style='{resource borderValue}'>
+           <textblock style='{resource defaultText}' text="{element s2.value}" />
+       </border>    
+    </stack>
+
+   <textblock style='{resource headerText}'>1-200, Step 10</textblock>
+   <stack margin='10' orientation="horizontal">
+      <slider valign='center' name="s3" min="0" max="200" step="10" value="100" />
+      <border style='{resource borderValue}'>
+          <textblock style='{resource defaultText}' text="{element s3.value}" />
+      </border>
+   </stack>
+</stack>
+</script>
+
+
+
+<script id='layoutcanvas' type='application/xml'>
+<layoutcanvas width="300" height="300" background="WhiteSmoke">
+   <border layoutcanvas.top="40" layoutcanvas.left="40" width="150" height="20" background="Red" />
+
+   <border layoutcanvas.top="30" layoutcanvas.left="80" width="20" height="130" background="Purple" zorder="1" />
+
+   <border layoutcanvas.top="100" layoutcanvas.left="60" width="170" height="30" background="#0077FF" zorder='2' />
+
+   <border layoutcanvas.top="180" layoutcanvas.left="120" width="80" height="80" background="Orange" />
+  
+   <textblock text='Place Stuff Anywhere.' style='{resource defaultText}' layoutcanvas.top='210' layoutcanvas.left='150' />
+</layoutcanvas>
+</script>
+
+<script id='button' type='application/xml'>
+<stack>
+  <textblock margin="0,10" text='Buttons can contain text or other elements.' />
+  <button width="80">text button</button>
+  <button margin="10,0,0,0">
+    <border width="150" height="150" background="Green">
+      <textblock foreground="White" halign="center" valign="center" text='button with content' />
+    </border>
+  </button>
+</stack>
+</script>
+
+<script id='radiobutton' type='application/xml'>
+<stack>
+  <textblock margin="0,10" text='Radio Buttons' />
+
+  <stack orientation="horizontal">
+    <radiobutton groupname="1"></radiobutton>
+    <textblock margin="0,0,0,5" text='Option 1' />
+  </stack>
+
+  <stack orientation="horizontal">
+    <radiobutton groupname="1"></radiobutton>
+    <textblock margin="0,0,0,5" text='Option 2' />
+  </stack>
+
+  <stack orientation="horizontal">
+    <radiobutton groupname="1"></radiobutton>
+    <textblock margin="0,0,0,5" text='Option 3' />
+  </stack>
+
+  <stack orientation="horizontal">
+    <radiobutton groupname="1"></radiobutton>
+    <textblock margin="0,0,0,5" text='Option 4' />
+  </stack>
+</stack>
+</script>
+
+<script id='checkbox' type='application/xml'>
+<stack>
+  <textblock margin="0,10" text='Checkboxes' />
+
+  <stack orientation="horizontal">
+    <checkbox groupname="1"></checkbox>
+    <textblock margin="0,0,0,5" text='Option 1' />
+  </stack>
+
+  <stack orientation="horizontal">
+    <checkbox groupname="1"></checkbox>
+    <textblock margin="0,0,0,5" text='Option 2' />
+  </stack>
+
+  <stack orientation="horizontal">
+    <checkbox groupname="1"></checkbox>
+    <textblock margin="0,0,0,5" text='Option 3' />
+  </stack>
+
+  <stack orientation="horizontal">
+    <checkbox groupname="1"></checkbox>
+    <textblock margin="0,0,0,5" text='Option 4' />
+  </stack>
+</stack>
+</script>
+
+<script id='hyperlink' type='application/xml'>
+<stack >
+  <textblock margin="0,10" text='Hyperlinks can contain text or other elements.' />
+  <hyperlink targetname="_blank" navigateto="https://github.com/prujohn/Buckshot/wiki/">Text Hyperlink</hyperlink>
+  <hyperlink width="170" margin="10,0,0,0" targetname="_blank" navigateto="https://github.com/prujohn/Buckshot/wiki/">
+    <border width="150" height="150" background="Green">
+      <textblock foreground="White" halign="center" valign="center" text='Content hyperlink' />
+    </border>
+  </hyperlink>
+</stack>
+</script>
+
+<script id='grid' type='application/xml'>
+<!--
+grid Demo
+
+grid is a very dynamic layout container.  It supports 3 different column/row
+measurement types:
+   - Pixel. Row or column is a fixed value in pixels.
+   - Star. Takes up a weighted size of available space relative to other
+     star-type peers.
+   - Auto. Attempts to size to the largest element in the row or column
+
+In this demo, the first row is and "auto" type, and the textblock is using a 
+grid.columnspan attached property to span across all 4 columns.
+
+The remaining rows are laid out equally spaced with "*" (star-type). 
+
+The columns are more interesting.  Notice how the first column is 
+automatically the size of the largest text element.
+
+For the next 2 columns, notice how the "*2" column is exactly twice as big as the
+"*1" column.  Change the width of the grid to see how this adjusts automatically.
+
+The fourth column is pixel-type of 100, and remains fixed in place.
+-->
+<stack>
+  <resourcecollection>
+     <lineargradientbrush direction="vertical" key="gridbg" fallbackcolor="PowderBlue">
+       <stops>
+         <gradientstop color="White"></gradientstop>
+         <gradientstop color="Orange"></gradientstop>
+       </stops>
+     </lineargradientbrush>
+     
+     <styletemplate key='borderCell'>
+        <setters>
+           <setter property='borderColor' value='Black' />
+           <setter property='borderThickness' value='1' />
+           <setter property='hAlign' value='stretch' />
+           <setter property='vAlign' value='stretch' />
+        </setters>
+     </styletemplate>
+  </resourcecollection>
+  <grid margin='10' width='400' height='400' background="{resource gridbg}">
+    <columndefinitions>
+      <columndefinition width="auto"></columndefinition>
+      <columndefinition width="*1"></columndefinition>
+      <columndefinition width="*2"></columndefinition>
+      <columndefinition width="100"></columndefinition>
+    </columndefinitions>
+    <rowdefinitions>
+      <rowdefinition height="auto"></rowdefinition>
+      <rowdefinition height="*"></rowdefinition>
+      <rowdefinition height="*"></rowdefinition>
+      <rowdefinition height="*"></rowdefinition>
+    </rowdefinitions>
+  
+    <textblock text="Grid Demo" grid.columnspan="4" halign="center"/>
+  
+    <border grid.row="1" style='{resource borderCell}'>
+      <textblock style='{resource defaultText}'>auto</textblock>
+    </border>
+    <border grid.row="1" grid.column="1" style='{resource borderCell}'>
+      <textblock style='{resource defaultText}'>*1</textblock>
+    </border>
+    <border grid.row="1" grid.column="2" style='{resource borderCell}'>
+      <textblock style='{resource defaultText}'>*2</textblock>
+    </border>
+    <border grid.row="1" grid.column="3" style='{resource borderCell}'>
+      <textblock style='{resource defaultText}'>pixel 100</textblock>
+    </border>
+    
+    <border grid.row="2" borderthickness="1" bordercolor="Black" valign='stretch'>
+      <textblock style='{resource defaultText}'>auto column</textblock>
+    </border>
+    <border grid.row="2" grid.column="1" style='{resource borderCell}'>
+      <textblock style='{resource defaultText}'>*1</textblock>
+    </border>
+    <border grid.row="2" grid.column="2" style='{resource borderCell}'>
+      <textblock style='{resource defaultText}'>*2</textblock>
+    </border>
+    <border grid.row="2" grid.column="3" style='{resource borderCell}'>
+      <textblock style='{resource defaultText}'>pixel 100</textblock>
+    </border>
+    
+    <border grid.row="3" style='{resource borderCell}'>
+      <textblock style='{resource defaultText}'>auto</textblock>
+    </border>
+    <border grid.row="3" grid.column="1" style='{resource borderCell}'>
+      <textblock style='{resource defaultText}'>*1</textblock>
+    </border>
+    <border grid.row="3" grid.column="2" style='{resource borderCell}'>
+      <textblock style='{resource defaultText}'>*2</textblock>
+    </border>
+    <border grid.row="3" grid.column="3" style='{resource borderCell}'>
+      <textblock style='{resource defaultText}'>pixel 100</textblock>
+    </border>
+  
+  </grid>
+</stack>
+</script>
+
+<script id='resources' type='application/xml'>
+<!--
+Resources Demo
+--------------
+
+Resources allow designers to create reusable components for use within their layouts.
+
+Using resources saves time and reduces redundant information.
+
+There are many different types of resources: Brushes, style templates, urls,
+numerics, strings, and more...
+
+To apply a resource to a property, use the binding syntax:
+property="{resource [nameOfResource]}"
+
+-->
+
+<stack>
+  
+  <!-- 
+  <resourcecollection> is used to declare a group of resources.
+  The framework will parse the collection make the resources available
+  to elements.  Resources are application scope, meaning that once declared,
+  they are available to all elements within an application.
+  --> 
+  <resourcecollection>
+
+    <!-- here we are declaring a brush resource -->
+    <lineargradientbrush key="lgb" direction="vertical">
+      <stops>
+        <gradientstop color="Red"></gradientstop>     
+        <gradientstop color="White"></gradientstop>
+        <gradientstop color="Blue"></gradientstop>
+      </stops>
+    </lineargradientbrush>
+
+    <!-- here is another brush resource -->
+    <radialgradientbrush key="rgb" drawmode="cover">
+      <stops>
+        <gradientstop color="Red"></gradientstop>
+        <gradientstop color="White"></gradientstop>
+        <gradientstop color="Blue"></gradientstop>
+      </stops>
+    </radialgradientbrush>
+  
+    <!-- 
+    This styletemplate resource sets a group of property values
+    that can be assigned to an element's 'style' property.  Notice how
+    the background property is binding to the lineargradientbrush resource
+    from above.
+    -->
+    <styletemplate key="firstborder">
+      <setters>
+        <setter property="width" value="150" />
+        <setter property="margin" value="5" />
+        <setter property="borderThickness" value="2" />
+        <setter property="cornerRadius" value="7" />
+        <setter property="borderColor" value="Black" />
+        <setter property="height" value="75" />
+        <setter property="background" value="{resource lgb}" />
+      </setters>
+    </styletemplate>
+
+    <styletemplate key="secondborder">
+      <setters>
+        <setter property="margin" value="5" />
+        <setter property="width" value="150" />
+        <setter property="borderThickness" value="2" />
+        <setter property="cornerRadius" value="7" />
+        <setter property="borderColor" value="Black" />
+        <setter property="height" value="75" />
+        <setter property="background" value="{resource rgb}" />
+      </setters>
+    </styletemplate>
+
+    <styletemplate key="thirdborder">
+      <setters>
+        <setter property="margin" value="5" />
+        <setter property="width" value="150" />
+        <setter property="borderThickness" value="1" />
+        <setter property="cornerRadius" value="20" />
+        <setter property="borderColor" value="Purple" />
+        <setter property="height" value="75" />
+        <setter property="background" value="Green" />
+      </setters>
+    </styletemplate>
+
+    <!-- Here we define a style template for our textblocks -->
+    <styletemplate key="textstyle">
+      <setters>
+        <setter property="hAlign" value="center" />
+        <setter property="vAlign" value="center" />
+        <setter property="fontSize" value="14" />
+      </setters>
+    </styletemplate>
+  
+  </resourcecollection>
+  <stack orientation="horizontal">
+
+     <!-- 
+      notice the binding syntax which tells the framework to look for the
+      resource with the key 'firstborder' and apply it to the 'style' property.
+       -->
+     <border style="{resource firstborder}">
+        <textblock style="{resource textstyle}" text="First border Style" />
+     </border>
+     <border style="{resource secondborder}">
+        <textblock style="{resource textstyle}" text="Second border Style" />
+     </border>
+     <border style="{resource thirdborder}">
+        <textblock style="{resource textstyle}" foreground="White" text="Third border Style" />
+     </border>
+  </stack>
+
+  <!-- We can apply the same resources to the elements in this grouping -->
+  <stack orientation="horizontal">
+     <border style="{resource firstborder}">
+        <textblock style="{resource textstyle}" text="First border Style" />
+     </border>
+     <border style="{resource secondborder}">
+        <textblock style="{resource textstyle}" text="Second border Style" />
+     </border>
+     <border style="{resource thirdborder}">
+        <textblock style="{resource textstyle}" foreground="White" text="Third border Style" />
+     </border>
+  </stack>
+  <textblock text="Short Video On How Resources Work:"/>
+  <youtube width="300" height="250" videoid="cFxf3OBIj8Q"></youtube>
+</stack>
+</script>
+
+<script id='elementbinding' type='application/xml'>
+<!--
+This demo shows how easy it is to build a simple, but interactive 
+UI without having to write any code.
+
+The controls on the left side are adjusting the properties of the
+boarder in the display area.  This is accomplished through 
+declarative element-to-element binding.
+-->
+
+<stack>
+  <textblock fontsize="24" text='This demo is written entirely with templates - no code.'/>
+  <stack width="650" orientation="horizontal">
+  
+    <grid margin="5" width="210">
+      <columndefinitions>
+        <columndefinition width="*1"></columndefinition>
+        <columndefinition width="*2"></columndefinition>
+        <columndefinition width="*.5"></columndefinition>
+      </columndefinitions>
+      <rowdefinitions>
+        <rowdefinition height="auto"></rowdefinition>
+        <rowdefinition height="auto"></rowdefinition>
+        <rowdefinition height="auto"></rowdefinition>
+        <rowdefinition height="auto"></rowdefinition>
+        <rowdefinition height="auto"></rowdefinition>
+      </rowdefinitions>
+    
+      <!-- labels -->
+      <textblock text="Color:"/>
+      <textblock grid.row="1" text="Width:"/>
+      <textblock grid.row="2" text="Height:"/>
+      <textblock grid.row="3" text="Corner:"/>
+    
+      <!-- controls -->
+
+      <dropdownlist name="ddlColors" width="100" grid.column="1">
+        <items>
+          <DropDownItem name="Red" />
+          <DropDownItem name="Green" />
+          <DropDownItem name="Blue" />
+          <DropDownItem name="LightBlue" />
+          <DropDownItem name="Tan" />
+          <DropDownItem name="Orange" />
+          <DropDownItem name="Purple" />
+          <DropDownItem name="Lime" />
+          <DropDownItem name="DarkGreen" />
+          <DropDownItem name="Yellow" />
+        </items>
+      </dropdownlist>
+      <slider name="slWidth" grid.row="1" grid.column="1" min="20" max="300" value="150" width="100"></slider>
+      <slider name="slHeight" grid.row="2" grid.column="1" min="20" max="300" value="150" width="100"></slider>
+      <slider name="slCorner" grid.row="3" grid.column="1" min="1" max="20" value="1" width="100"></slider>
+    
+      <!-- value labels, bound to controls via element binding -->
+      <textblock grid.column="2" grid.row="1" text="{element slWidth.value}"/>
+      <textblock grid.column="2" grid.row="2" text="{element slHeight.value}"/>
+      <textblock grid.column="2" grid.row="3" text="{element slCorner.value}"/>
+
+      <!-- using declarative actions, we reset the values of the controls when the user clicks the button -->
+      <button grid.row="4" content='Reset'>
+        <actions>
+          <setproperty event="click" targetName="slWidth" property="value" value="150"></setproperty>
+          <setproperty event="click" targetName="slHeight" property="value" value="150"></setproperty>
+          <setproperty event="click" targetName="slCorner" property="value" value="1"></setproperty>
+        </actions>
+      </button>
+
+    </grid>
+   
+    <border margin="5" width="400" height="400" borderthickness="1" bordercolor="Black">
+      <!-- this border is bound to the controls via element binding -->
+      <border halign="center" 
+              valign="center" 
+              bordercolor="Black" 
+              cornerradius="{element slCorner.value}" 
+              width="{element slWidth.value}" 
+              height="{element slHeight.value}" 
+              background="{element ddlColors.selectedItem.name}">
+      </border>
+    </border>
+  </stack>
+  <textblock margin="10,0,0,0" text="Video On How Element Binding Works:"/>
+  <youtube width="300" height="250" videoid="WC25C5AHYAI"></youtube>
+</stack>
+</script>
+
+<script id='databinding' type='application/xml'>
+<!-- 
+Data Binding Demo
+
+This demo shows how Buckshot properties can be bound to data
+objects in your code.  This demo is fairly basic, but imagine
+that you are dealing with objects such as query returns from
+databases, etc.  It works the same.
+
+Each framework element has a property called "dataContext" and
+if you assign an object to it, that object or it's properties
+can be bound to properties of the element.
+
+When elements declare a data binding (using '{data ...}'), the
+Framework tries to bind to whatever object is assigned 
+to the dataContext of that element.  If dataContext is null, 
+then the framework walks up the visual tree until it finds a 
+dataContext that has some data, and attempts to bind to that.
+-->
+
+
+<stack>
+  <resourcecollection>
+    <!-- 
+    Define a resource template for our borders since they share 
+    common properties. 
+    -->
+    <styletemplate key="borderstyle">
+      <setters>
+        <setter property="width" value="100" />
+        <setter property="height" value="100" />
+        <setter property="margin" value="5" />
+      </setters>
+    </styletemplate>
+  </resourcecollection>
+
+  <textblock style='{resource headerText}' text='Binding to a timer.' />
+  <stack orientation="horizontal">
+    <!-- binding to the 'timeStamp' property of the dataContext object -->
+    <textblock style='{resource defaultText}' text="{data timeStamp}" />
+  </stack>
+
+  <textblock style='{resource headerText}' text='Binding to some color values.' />
+  <stack orientation="horizontal">
+    <!-- these borders are binding to a sub-property of a property, using 
+     Buckshot's dot notation resolver -->
+    <border style="{resource borderstyle}" background="{data color.red}" />
+    <border style="{resource borderstyle}" background="{data color.orange}" />
+    <border style="{resource borderstyle}" background="{data color.blue}" />
+  </stack>
+
+  <textblock style='{resource headerText}' text='Two-Way Binding' />
+  <stack orientation='horizontal'>
+     <textbox placeholder='Type something here...' name='tbFirst' />
+     <textblock text='<-->' />
+     <textbox placeholder='Or here...' text='{element tbFirst.text, mode=twoway}' />
+  </stack>  
+</stack>
+</script>
+
+<script id='collections' type='application/xml'>
+<stack>
+  <!-- declare resources for common settings -->
+  <resourcecollection>
+    <lineargradientbrush key="rowbg" direction="vertical" fallbackcolor="Orange">
+      <stops>
+        <gradientstop color="#EEEE77"></gradientstop>
+        <gradientstop color="Orange"></gradientstop>
+      </stops>
+    </lineargradientbrush>
+    <styletemplate key="header">
+      <setters>
+        <setter property="margin" value="1" />
+        <setter property="padding" value="5" />
+        <setter property="background" value="DarkGreen" />
+      </setters>
+    </styletemplate>
+    <styletemplate key="rows">
+      <setters>
+        <setter property="margin" value="1,0" />
+        <setter property="padding" value="5" />
+        <setter property="background" value="{resource rowbg}" />
+      </setters>
+    </styletemplate>
+  </resourcecollection>
+
+  <textblock fontsize="20">Binding To Collections</textblock>
+
+  <!-- 
+  Display a title for each column of data.
+  (note the resource binding for border styles)
+  -->
+  <stack orientation="horizontal">
+    <border width="150" style="{resource header}">
+      <textblock foreground="White" text="Title"/>
+    </border>
+    <border width="150" style="{resource header}">
+      <textblock foreground="White" text="Description"/>
+    </border>
+    <border width="310" style="{resource header}">
+      <textblock foreground="White" text="Video"/>
+    </border>
+  </stack>
+
+  <!--
+  CollectionsPresenter is a general-purpose control for rendering
+  a list of content.  Notice how it is binding to the 'videos' list
+  which is exposed by the higher-up data context (the view model).
+  -->
+  <collectionpresenter datacontext="{data videos}">
+    <!-- 
+    The presentationPanel property provides a way to customize
+    the container that the list will render inside of.
+    -->
+    <presentationpanel>
+      <stack></stack>
+    </presentationpanel>
+
+    <!--
+    The itemsTemplate property is where you build up your UI
+    for each "row" of data in the list.
+    Notice how the textblock's are binding to the fields of the 'videos'
+    list.
+    -->
+    <itemstemplate>
+      <stack orientation="horizontal">
+        <border valign='stretch' width="150" style="{resource rows}">
+          <textblock halign='stretch' foreground="Black" text="{data title}"/>
+        </border>
+        <border valign='stretch' width="150" style="{resource rows}">
+          <textblock halign='stretch' foreground="Black" text="{data description}"/>
+        </border>
+        <border width="310" style="{resource rows}">
+          <youtube margin="10" videoid="{data hash}" width="300" height="200"></youtube>
+        </border>
+      </stack>
+    </itemstemplate>
+  </collectionpresenter>
+  <textblock margin="10,0,0,0">To see the view model that this demo is binding to:</textblock>
+  <hyperlink content="View Model Code in Dart" targetname="_blank" navigateto="https://github.com/prujohn/Buckshot/blob/master/demos/tryit/DemoViewModel.dart"></hyperlink>
+</stack>
+</script>
+
+<script id='dropdownlist' type='application/xml'>
+<stack>
+  <textblock style='{resource headerText}' text="List From Data Source:"/>
+  
+  <dropdownlist name="ddlFruit" itemssource="{data fruit}"></dropdownlist>
+
+  <stack orientation="horizontal">
+    <textblock style='{resource defaultText}' valign='center' text="Current Choice:" />
+    <border margin='0,0,0,5' padding='4' borderColor='Black' borderthickness='2' background='Khaki'>
+       <textblock style='{resource defaultText}' text="{element ddlFruit.selectedItem.name}"/>
+    </border>
+  </stack>
+  
+  <textblock style='{resource headerText}' text="List From Template:"/>
+  
+  <dropdownlist name="ddlColors">
+    <items>
+      <DropDownItem name="Red" value="Red" />
+      <DropDownItem name="Blue" value="Blue" />
+      <DropDownItem name="Green" value="Green" />
+      <DropDownItem name="Orange" value="Orange" />
+      <DropDownItem name="Tan" value="Tan" />
+    </items>
+  </dropdownlist>
+  
+  <!-- Element binding is used here to set the border's background color -->
+  <border margin="5,0,0,0" width="75" height="75" background="{element ddlColors.selectedItem.name}"></border>
+
+</stack>
+</script>
+
+<script id='listbox' type='application/xml'>
+<!--
+ListBox Demo
+
+Three ListBoxes are displayed.  The first is a simple textual ListBox.
+The second and third demonstration customized item templates and orientation
+support.
+
+All of the ListBoxes are binding to collections in a view model, and then
+using client-side element binding to display the selected item from
+each list. 
+ --> 
+<stack>
+
+  <!-- declare resources for common settings -->
+  <resourcecollection>
+    <lineargradientbrush key="rowbg" direction="vertical" fallbackcolor="Orange">
+      <stops>
+        <gradientstop color="Yellow"></gradientstop>
+        <gradientstop color="Orange"></gradientstop>
+      </stops>
+    </lineargradientbrush>
+    <styletemplate key="title">
+      <setters>
+        <setter property="fontSize" value="20" />
+        <setter property="fontFamily" value="arial" />
+        <setter property="margin" value="20,0,0,0" />
+      </setters>
+    </styletemplate>
+    <styletemplate key="rows">
+      <setters>
+        <setter property="margin" value="1,0" />
+        <setter property="padding" value="5" />
+        <setter property="background" value="{resource rowbg}" />
+      </setters>
+    </styletemplate>
+  </resourcecollection>
+
+  <textblock style="{resource title}">Basic ListBox</textblock>
+
+  <stack orientation="horizontal">
+    <listbox name="lbBasic" width="100" datacontext="{data fruit}">
+      <presentationpanel>
+        <stack width="100"></stack>
+      </presentationpanel>
+    </listbox>
+    <stack margin="0,0,0,20">
+      <textblock text="Your Selection:"/>
+      <textblock fontsize="18" foreground="Green" text="{element lbBasic.selectedItem}"/>
+    </stack>
+  </stack>
+  
+  <textblock style="{resource title}">Vertical ListBox (Custom Template)</textblock>
+  
+  <stack orientation="horizontal">
+    <listbox name="lbVertical" datacontext="{data icons}" height="150" width="300">
+      <itemstemplate>
+        <border style="{resource rows}"> 
+          <stack orientation="horizontal">
+            <border width="64" height="64" margin="5,5">
+              <image halign="center" valign="center" sourceuri="{data uri}"></image>
+            </border>
+            <stack width="200">
+              <textblock foreground="Black" fontfamily="arial" text="{data name}"/>
+              <textblock foreground="Black" fontsize="12" text="{data description}"/>
+            </stack>      
+          </stack>
+        </border>
+      </itemstemplate>
+    </listbox>
+  
+      <stack margin="0,0,0,20">
+        <textblock text="Your Selection:"/>
+        <border width="64" height="64">
+          <image sourceuri="{element lbVertical.selectedItem.Uri}"></image>
+        </border>
+      </stack>
+  </stack>
+  <textblock style="{resource title}">Horizontal ListBox</textblock>
+  
+  <stack orientation="horizontal">
+    <listbox name="lbHorizontal" datacontext="{data icons}" width="300" verticalScrollEnabled="false" horizontalScrollEnabled="true">
+      <presentationpanel>
+        <stack orientation="horizontal"></stack>
+      </presentationpanel>
+      <itemstemplate>
+        <border style="{resource rows}" width="150"> 
+          <stack>
+            <border width="150" height="64">
+              <image halign="center" valign="center" sourceuri="{data uri}"></image>
+            </border>
+            <textblock foreground="Black" fontfamily="arial" text="{data name}"/>
+            <textblock foreground="Black" fontsize="12" text="{data description}"/>
+          </stack>
+        </border>
+      </itemstemplate>
+    </listbox>
+  
+    <stack margin="0,0,0,20">
+      <textblock text="Your Selection:"/>
+      <border width="64" height="64">
+        <image sourceuri="{element lbHorizontal.selectedItem.Uri}"></image>
+      </border>
+    </stack>
+  
+  </stack>
+
+  <textblock margin="20,0,0,0">To see the view model that this demo is binding to:</textblock>
+
+  <hyperlink content="View Model Code in Dart" targetname="_blank" navigateto="https://github.com/prujohn/Buckshot/blob/master/demos/tryit/DemoViewModel.dart"></hyperlink>
+  
+  <textblock margin="20,0,0,0" fontsize="12">Icons used in this demo are licensed to LUCA Studios LLC and may not be redistributed.</textblock>
+</stack>
+</script>
+
+<!-- content for the ModalDialog demo -->
+<script id='modaldialog' type='application/xml'>
+<stack>
+  <textblock fontfamily='Arial' margin='0,5' text='Dialogs can host any content in the title and body.' />
+  <textbox width='400' placeholder='Including input from the user' />
+  <textblock fontfamily='Arial' margin='0,5' text='ModalDialog also supports buttons for everything from simple dialogs to multi-step wizards.' />
+  <textblock fontfamily='Arial' margin='0,5' text='Here are some examples:' />
+  <stack background='Gray' orientation='horizontal'>
+    <button content='Ok' />
+    <button content='Cancel' />
+  </stack>
+  <stack background='Gray' orientation='horizontal'>
+    <button content='Yes' />
+    <button content='No' />
+  </stack>
+  <stack background='Gray' orientation='horizontal'>
+    <button content='Next' />
+    <button content='Back' />
+    <button content='Finished' />
+  </stack>
+</stack>
+</script>
+
+<!-- content for the popup control demo -->
+<script id='popup' type='application/xml'>
+<stack margin='10'>
+   <textblock halign='center' style='{resource headerText}' text='Popup Control' />
+   <textblock style='{resource defaultText}' text='Popup control will hover over a specific area relative to another element.' />
+   <textblock style='{resource defaultText}' text='It can contain any type of content, like these circles:' />
+   <stack halign='center' orientation='horizontal'>
+     <border background='Red' width='20' height='20' cornerradius='10' />
+     <border background='Orange' width='20' height='20' cornerradius='10' />
+     <border background='Green' width='20' height='20' cornerradius='10' />
+     <border background='Blue' width='20' height='20' cornerradius='10' />
+     <border background='Purple' width='20' height='20' cornerradius='10' />
+   </stack>
+   <textblock style='{resource defaultText}' text='Or this video:' />
+   <youtube halign='center' margin="10" videoid="LOacOkmd9FI" width="300" height="200"></youtube>
+   <textblock style='{resource defaultText}' text='Click in the Popup area to close it.' />
+</stack>
+</script>
+
+<script id='tabcontrol' type='application/xml'>
+<stack>
+   <textblock style='{resource headerText}' text='TabControl allows you to group content into tabs.' />
+   <tabcontrol margin='10,0,0,0' background='SteelBlue' width='600' height='340'>
+      <tabitem header='Actions' closeenabled='false'>
+         <youtube width='350' height='300' videoid='C8qwuD2Bz3E' />
+      </tabitem>
+      <tabitem header='Event Model' closeenabled='false'>
+         <youtube width='350' height='300' videoid='eUmVlWxrE9E' />
+      </tabitem>
+      <tabitem header='Templates' closeenabled='false'>
+         <youtube width='350' height='300' videoid='LOacOkmd9FI' />
+      </tabitem>
+      <tabitem header='DockPanel' closeenabled='false'>
+         <youtube width='350' height='300' videoid='aVlRGukZN3k' />
+      </tabitem>
+      <tabitem header='TreeView' closeenabled='false'>
+         <youtube width='350' height='300' videoid='6DWP-E7omJs' />
+      </tabitem>
+   </tabcontrol>
+</stack>
+</script>
+
+<script id='transforms' type='application/xml'>
+<stack>
+   <textblock style='{resource headerText}'>You can scale, rotate, and translate any Buckshot element.</textblock>
+
+   <stack orientation='horizontal'>
+      <stack>
+         <textblock style='{resource headerText}' text='Rotate' />
+         <stack orientation='horizontal'>
+            <textblock style='{resource defaultText}' text='X:' />
+            <slider name='slRX' min='-180' max='180' value='0' />
+         </stack>
+         <stack orientation='horizontal'>
+            <textblock style='{resource defaultText}' text='Y:' />
+            <slider name='slRY' min='-180' max='180' value='0' />
+         </stack>
+         <stack orientation='horizontal'>
+            <textblock style='{resource defaultText}' text='Z:' />
+            <slider name='slRZ' min='-180' max='180' value='0' />
+         </stack>
+         <textblock style='{resource headerText}' text='Scale' />
+         <stack orientation='horizontal'>
+            <textblock style='{resource defaultText}' text='X:' />
+            <slider name='slSX' min='1' max='3' value='1' step='.1' />
+         </stack>
+         <stack orientation='horizontal'>
+            <textblock style='{resource defaultText}' text='Y:' />
+            <slider name='slSY' min='1' max='3' value='1' step='.1' />
+         </stack>
+         <stack orientation='horizontal'>
+            <textblock style='{resource defaultText}' text='Z:' />
+            <slider name='slSZ' min='1' max='3' value='1' step='.1' />
+         </stack>
+         <textblock style='{resource headerText}' text='Translate' />
+         <stack orientation='horizontal'>
+            <textblock style='{resource defaultText}' text='X:' />
+            <slider name='slTX' min='-100' max='100' value='0' />
+         </stack>
+         <stack orientation='horizontal'>
+            <textblock style='{resource defaultText}' text='Y:' />
+            <slider name='slTY' min='-100' max='100' value='0' />
+         </stack>
+         <stack orientation='horizontal'>
+            <textblock style='{resource defaultText}' text='Z:' />
+            <slider name='slTZ' min='-100' max='100' value='0' />
+         </stack>
+      </stack>
+      <border margin='0,0,0,15' bordercolor='SteelBlue' borderthickness='2' width='300' height='300'>
+         <border halign='center' valign='center' 
+            scalex='{element slSX.value}' 
+            scaley='{element slSY.value}'
+            scalez='{element slSZ.value}'
+            translatex='{element slTX.value}'
+            translatey='{element slTY.value}'
+            translatez='{element slTZ.value}'
+            rotatex='{element slRX.value}'
+            rotatey='{element slRY.value}'
+            rotatez='{element slRZ.value}'
+            background='Orange' 
+            width='75' 
+            height='75'>
+            <image halign='center' valign='center' width='65' sourceuri='apps/calculator/resources/buckshot_logo.png' alt='Buckshot Logo' />
+         </border>
+      </border> 
+   </stack>
+</stack>
+</script>
+
+<!--
+
+End Buckshot Templates
+
+-->
+
+    <!--<script type="application/dart" src="sandbox.dart"></script>-->
+       <script src="sandbox.dart.js"></script> 
+   <!-- <script src="http://dart.googlecode.com/svn/branches/bleeding_edge/dart/client/dart.js"></script>-->
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-25453306-1']);
+_gaq.push(['_trackPageview']);
+
+(function () {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+  </body>
+</html>

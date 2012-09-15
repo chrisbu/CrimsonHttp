@@ -24,7 +24,7 @@ class CrimsonModule  {
         if (handlerIterator.hasNext()) {
           CrimsonHandler handler = handlerIterator.next();
           print("trying handler: ${handler.NAME}");
-          Future<CrimsonData> onHandled = handler.handle(req,res,data);
+          Future<Map> onHandled = handler.handle(req,res,data);
         
           //it is valid for a handler to return null, when they are not even 
           //going to attempt to try and handle it, for example, when the 
@@ -45,9 +45,9 @@ class CrimsonModule  {
               try {
                 completer.completeException(error);
               }
-              catch (var ex, var stack) {
-                print(ex);
-                print(stack);
+              on Exception catch(e) {
+                print(e);
+//                print(stack);
                 //res.outputStream.close();
               }
               

@@ -13,7 +13,7 @@ class Route implements CrimsonEndpoint {
   ///The handler should return a future (or null).  When the future is complete
   ///or null is returned, the output stream will be closed.
   ///The future could return an exception.
-  Route(String this._path, String this._method, Future handler(HttpRequest, HttpResponse, CrimsonData)) {
+  Route(String this._path, String this._method, Future handler(HttpRequest, HttpResponse, Map)) {
     _name = "ROUTE:${_method}:${_path}";
     logger = LoggerFactory.getLogger(_name);
     _handler = handler;
@@ -22,13 +22,13 @@ class Route implements CrimsonEndpoint {
   
   /// Allow matching with a custom _matcher function, which should return true or false.
   /// The [routeIdentifier] is provided to provide a way to log
-  Route.withMatcher(bool this._matcher(HttpRequest req), String _routeIdentifier, Future handler(HttpRequest, HttpResponse, CrimsonData)) {
+  Route.withMatcher(bool this._matcher(HttpRequest req), String _routeIdentifier, Future handler(HttpRequest, HttpResponse, Map)) {
     _name = "ROUTE:matcher:${_routeIdentifier}";
     logger = LoggerFactory.getLogger(_name);
     _handler = handler;
   }
   
-  Future<CrimsonData> handle(HttpRequest req, HttpResponse res, CrimsonData data) {
+  Future<Map> handle(HttpRequest req, HttpResponse res, Map data) {
     logger.debug("Request:${req.method}:${req.path} - Handler:${this._method}:${this._path}");
     bool isMatched = false;
     if (this._matcher != null) {

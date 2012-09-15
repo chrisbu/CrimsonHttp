@@ -3,13 +3,14 @@
 // can be found in the LICENSE file.
 // website: 
 
-
 #library("crimson:core");
-
-#import('../../log4dart/LogLib.dart');
 #import("dart:io");
 #import("dart:uri");
 #import("dart:isolate", prefix:"isolate");
+#import("dart:crypto");
+#import("dart:math", prefix:"Math");
+
+#import('../third_party/log4dart/log4dart.dart');
 
 #source('crimson.dart');
 #source('crimson_impl.dart');
