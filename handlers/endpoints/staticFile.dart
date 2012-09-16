@@ -17,8 +17,9 @@ class StaticFile implements CrimsonEndpoint {
   
   Future<Map> handle(HttpRequest request, HttpResponse response, Map data) {
     Completer completer = new Completer();
-    
-    String fileToLoad = "${this.rootPath}${request.uri}";
+    Uri p = new Uri(request.uri);
+    String fileToLoad = "${this.rootPath}${p.path}";
+    logger.debug("fileToLoad: ${fileToLoad}");
     
     onSuccess(List filedata) {
       logger.debug("Read file: ${fileToLoad}");
@@ -44,6 +45,9 @@ class StaticFile implements CrimsonEndpoint {
   }
   
   _loadFromPath(String path, success(List data), onNotFound(), fail(exception)) {
+    
+    logger.debug("_loadFromPath: $path");
+
     File file = new File(path);
     
     //file.fullPath((String fullPath) => print(fullPath));

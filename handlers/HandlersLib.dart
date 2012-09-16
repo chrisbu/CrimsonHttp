@@ -1,5 +1,6 @@
 #library("crimson:handlers");
 #import("dart:io");
+#import("dart:uri");
 #import("../core/CrimsonLib.dart");
 #import('../third_party/log4dart/log4dart.dart');
 
