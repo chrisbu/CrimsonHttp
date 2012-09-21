@@ -3,7 +3,7 @@
 #import("dart:utf");
 
 #import('package:log4dart/log4dart.dart');
-#import('package:crimsonhttp/Crimson.dart');
+#import('package:crimsonhttp/crimson.dart');
 
 void main() {
   CrimsonHttpServer server = new CrimsonHttpServer();
