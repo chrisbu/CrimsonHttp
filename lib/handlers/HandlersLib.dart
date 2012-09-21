@@ -2,7 +2,7 @@
 #import("dart:io");
 #import("dart:uri");
 #import("../core/CrimsonLib.dart");
-#import('../third_party/log4dart/log4dart.dart');
+#import('package:log4dart/log4dart.dart');
 
 #source("endpoints/favicon.dart");
 #source("endpoints/staticFile.dart");

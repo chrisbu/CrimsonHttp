@@ -2,9 +2,9 @@
 #import("dart:io");
 #import("dart:utf");
 
-#import('../third_party/log4dart/log4dart.dart');
-#import("../core/CrimsonLib.dart");
-#import("../handlers/HandlersLib.dart");
+#import('package:log4dart/log4dart.dart');
+#import('package:crimsonhttp/Crimson.dart');
+#import('package:crimsonhttp/Handlers.dart');
 
 void main() {
   CrimsonHttpServer server = new CrimsonHttpServer();

@@ -1,0 +1,8 @@
+name: crimsonhttp
+description: Dart Web Server inspired by sencha/connect
+version: 0.0.1
+dependencies:
+  unittest:
+    sdk: unittest
+  log4dart:
+    git: git://github.com/Solvr/log4dart.git

@@ -10,7 +10,7 @@
 #import("dart:crypto");
 #import("dart:math", prefix:"Math");
 
-#import('../third_party/log4dart/log4dart.dart');
+#import('package:log4dart/log4dart.dart');
 
 #source('crimson.dart');
 #source('crimson_impl.dart');
