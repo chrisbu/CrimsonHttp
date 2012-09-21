@@ -1,6 +1,6 @@
-# CrimsonHttp server for Dart
+# CrimsonHttp server for Dart #
 
-## Introduction ## 
+## Introduction 
 
 Loosely inspired upon sencha/connect for node.js
 

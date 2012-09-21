@@ -13,8 +13,8 @@ void main() {
                     //.addEndpoint(new Route.withMatcher(matcherFunction,"helloMatcher",sayHello))
                     .addEndpoint(new Route("/buckshotbin","GET", getTemplateData))
                     .addEndpoint(new Route("/buckshotbin","POST", setTemplateData))
-                    .addEndpoint(new StaticFile("./test/public/"))
-                    .addEndpoint(new StaticFile("./test/sandbox/"));
+                    .addEndpoint(new StaticFile("./example/public/"))
+                    .addEndpoint(new StaticFile("./example/sandbox/"));
   
   server.modules["*"] = sampleModule;
   server.listen("0.0.0.0", 8082);
