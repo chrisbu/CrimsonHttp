@@ -13,7 +13,7 @@ class CookieSession implements CrimsonFilter {
     _sessions = new Map<String,Session>();
   }
   
-  Future<CrimsonData> handle(HttpRequest req, HttpResponse res, CrimsonData data) {
+  Future<Map> handle(HttpRequest req, HttpResponse res, Map data) {
     Completer completer = new Completer();
     if (req.path.endsWith("favicon.ico")) {
       //don't do session checking for favicon
@@ -63,7 +63,7 @@ class CookieSession implements CrimsonFilter {
       //otherwise, look for a real cookie header.
       cookieHeader = req.headers.value("cookie");
       if (cookieHeader != null) {
-        logger.debug("found real cookie header: " + cookieHeader);
+        logger.debug("found real cookie header: $cookieHeader");
       }
       else {
         logger.debug("didn't find existing cookie header");
@@ -121,8 +121,8 @@ class CookieSession implements CrimsonFilter {
         //generate a new ID.
         
         //this is a toy - don't use for real!
-        var md5 = new Md5();
-        String s = (Math.random() * Clock.now()).toInt().toString();
+        var md5 = new MD5();
+        String s = "FAIL"; //= (Math.random() * Clock.now()).toInt().toString();
         md5.update(s.charCodes());
         var hash = md5.digest();
         sessionid = new String.fromCharCodes(hash);    

@@ -17,7 +17,7 @@ class Favicon implements CrimsonEndpoint {
   /// current folder, or the current folder/public.
   /// If [pathToFavicon] is not null, then it will attempt to load favicon.ico
   /// from that location
-  Future<CrimsonData> handle(HttpRequest request, HttpResponse response, CrimsonData data) {
+  Future<Map> handle(HttpRequest request, HttpResponse response, Map data) {
     Completer completer = new Completer();
     
     //check whether this request is for favicon.
@@ -64,27 +64,27 @@ class Favicon implements CrimsonEndpoint {
   _loadFromPath(String path, success(List data), on404NotFound()) {
     File file = new File(path);
     
-    file.onError = (Exception error) {
-      logger.debug("${path} doesn't exist: ${error}");
-      on404NotFound();
-    };
+//    file.onError = (Exception error) {
+//      logger.debug("${path} doesn't exist: ${error}");
+//      on404NotFound();
+//    };
     
     
-    logger.debug("trying to open favicon");
+    logger.debug("NOT IMPLEMENTED trying to open favicon");
     
-    file.exists((bool exists) {
-      if (exists) {
-        logger.debug("${path} exists, so reading");
-        file.readAsBytes((List buffer) {
-          server.logger.debug("successfully read ${path}");
-          success(buffer);
-        });
-      }
-      else {
-        logger.debug("${path} doesn't exist");
-        on404NotFound();
-      }
-    });
+//    file.exists((bool exists) {
+//      if (exists) {
+//        logger.debug("${path} exists, so reading");
+//        file.readAsBytes((List buffer) {
+//          server.logger.debug("successfully read ${path}");
+//          success(buffer);
+//        });
+//      }
+//      else {
+//        logger.debug("${path} doesn't exist");
+//        on404NotFound();
+//      }
+//    });
     
   }
   
