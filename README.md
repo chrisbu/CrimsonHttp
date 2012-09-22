@@ -1,44 +1,46 @@
-CrimsonHttp server for Dart
-----------
+# CrimsonHttp server for Dart #
 
-Currently uses the chat sample http server, but will be ported to the 
-dart:io http server once that is released
+## Introduction 
 
 Loosely inspired upon sencha/connect for node.js
 
-Makes use of log4dart, found here: https://github.com/Qalqo/log4dart
-(It expects to find log4dart in ../log4dart (ie, at the same level as crimson, not within the 
-crimson folder structure).
+## Status: Alpha ##
+This code is alpha and might not be safe for production servers.  
 
------
-Usage: See test/crimsonTest.dart for example, but it goes something like this...
+## Example ##
 
-    main() {
-      CrimsonHttpServer server = new CrimsonHttpServer();
-  	  
-      CrimsonModule sampleModule = new CrimsonModule(server);
-      
-      sampleModule.handlers
-                    .addEndpoint(new Favicon("./favicon.ico"))               // match the favicon request
-                    .addFilter(new CookieSession())                          // adds session support
-                    .addEndpoint(new Route("/hello","GET",(req,res,data) {   // execute arbitary code that matches a route
-					   res.outputStream.write("Hello");
-					))  
-					.addEndpoint(
-					  new Route.withMatcher((req) => req.path.endsWith("someString"),  // matcher function returns bool
-					   "customMatcherName",                                            // matcher name for logging
-					   (req,res,data) => res.outputStream.write("Hello");              // execute on match
-					  )
-					)         
-                    .addEndpoint(new StaticFile("./public"));                // serve static files
+```
+#import("dart:io");
+#import("dart:utf");
+#import('package:crimsonhttp/crimson.dart');
+
+void main() {
+  CrimsonHttpServer server = new CrimsonHttpServer();
   
-      server.modules["*"] = sampleModule;  // this is the default module.
-   
-      server.listen("127.0.0.1", 8082); // start listening
-     
-    }
+  CrimsonModule sampleModule = new CrimsonModule(server);
+  sampleModule.handlers
+                    .addEndpoint(new StaticFile("./test/public/"))
+                    .addEndpoint(new StaticFile("./test/sandbox/"));
+  
+  server.modules["*"] = sampleModule;
+  server.listen("0.0.0.0", 8082);
+}
+```
 	
-	
+# Getting Started
+Create a Dart project and add a **pubspec.yaml** file to it
+
+```
+dependencies:
+  crimsonhttp:
+    git: https://github.com/chrisbu/CrimsonHttp.git
+```
+
+and run **pub install** to install **crimson** (including its dependencies). Now add import
+
+```
+#import('package:crimsonhttp/crimson.dart');
+```
 
 	
 #TODO

@@ -56,7 +56,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
     
     if (module != null) {
       try {
-        Future<CrimsonData> handled = module.handle(req,res);        
+        Future<Map> handled = module.handle(req,res);        
         handled.then((result) {
           res.outputStream.close();
         });
@@ -65,8 +65,8 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
           _httpErrorHandler(error);
         });
       }
-      catch (var ex, var stack) {
-        logger.error("${ex}, ${stack}");
+      on Exception catch(e) {
+        logger.error("${e}");
       }
     }
     else {
