@@ -12,14 +12,14 @@
 
 #import('package:log4dart/log4dart.dart');
 
-#source('core/crimson.dart');
-#source('core/crimson_impl.dart');
-#source('core/crimson_utils.dart');
-#source('core/crimsonPrivate.dart');
-#source('core/crimsonHttpServer.dart');
-#source('core/crimsonModule.dart');
+#source('src/core/crimson.dart');
+#source('src/core/crimson_impl.dart');
+#source('src/core/crimson_utils.dart');
+#source('src/core/crimsonPrivate.dart');
+#source('src/core/crimsonHttpServer.dart');
+#source('src/core/crimsonModule.dart');
 
-#source("handlers/endpoints/favicon.dart");
-#source("handlers/endpoints/staticFile.dart");
-#source("handlers/filters/cookieSession.dart");
-#source("handlers/endpoints/route.dart");
+#source("src/handlers/endpoints/favicon.dart");
+#source("src/handlers/endpoints/staticFile.dart");
+#source("src/handlers/filters/cookieSession.dart");
+#source("src/handlers/endpoints/route.dart");
