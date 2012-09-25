@@ -1,6 +1,10 @@
 name: crimsonhttp
 description: Dart Web Server inspired by sencha/connect
 version: 0.0.1
+author:
+- Chris Buckett <chrisbuckett@gmail.com>
+- Adam Singer <financeCoding@gmail.com>
+homepage: https://github.com/chrisbu/CrimsonHttp
 dependencies:
   unittest:
     sdk: unittest
