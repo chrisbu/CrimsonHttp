@@ -1,8 +1,8 @@
-#library('crimsonTest');
+library crimsonTest;
 
-#import("../core/CrimsonLib.dart");
-#import("../handlers/HandlersLib.dart");
-#import("dart:io");
+import '../core/CrimsonLib.dart';
+import '../handlers/HandlersLib.dart';
+import 'dart:io';
 
 ///Simple test server
 main() {

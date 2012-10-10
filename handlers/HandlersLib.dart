@@ -1,11 +1,11 @@
-#library("crimson:handlers");
-#import("../core/CrimsonLib.dart");
-#import("../../log4dart/lib/log4dart.dart");
-#import("dart:crypto");
-#import("dart:io");
+library crimson_handlers;
+import '../core/CrimsonLib.dart';
+import '../../log4dart/lib/log4dart.dart';
+import 'dart:crypto';
+import 'dart:io';
 
-#source("endpoints/favicon.dart");
-#source("endpoints/staticFile.dart");
-#source("filters/cookieSession.dart");
-#source("endpoints/route.dart");
-#source("endpoints/controllerRoute.dart");
+part 'endpoints/favicon.dart';
+part 'endpoints/staticFile.dart';
+part 'filters/cookieSession.dart';
+part 'endpoints/route.dart';
+part 'endpoints/controllerRoute.dart';
