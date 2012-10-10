@@ -51,6 +51,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
       module = modules["*"];
     }
     
+    res.persistentConnection = true; //we need this line for nginx proxy.
     if (module != null) {
       try {
         Future<CrimsonData> handled = module.handle(req,res);        
@@ -58,7 +59,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
           try {
             res.outputStream.close();
           }
-          catch (var ex, var stack) {
+          catch (ex, stack) {
             print("${ex}, ${stack}");
           }
         });
@@ -68,7 +69,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
           return true; //this consider a given error to be handled.
         });
       }
-      catch (var ex, var stack) {
+      catch (ex, stack) {
         logger.error("${ex}, ${stack}");
       }
     }

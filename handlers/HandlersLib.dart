@@ -1,6 +1,6 @@
 #library("crimson:handlers");
 #import("../core/CrimsonLib.dart");
-#import("../../log4dart/Lib.dart");
+#import("../../log4dart/lib/log4dart.dart");
 #import("dart:crypto");
 #import("dart:io");
 

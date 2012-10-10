@@ -6,7 +6,7 @@
 
 #library("crimson:core");
 
-#import('../../log4dart/Lib.dart');
+#import('../../log4dart/lib/log4dart.dart');
 #import("dart:io");
 #import("dart:uri");
 #import("dart:isolate", prefix:"isolate");

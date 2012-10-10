@@ -46,7 +46,7 @@ class CrimsonModule  {
               try {
                 completer.completeException(error);
               }
-              catch (var ex, var stack) {
+              catch (ex, stack) {
                 print(ex);
                 print(stack);
               }
