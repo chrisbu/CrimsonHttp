@@ -8,5 +8,4 @@ homepage: https://github.com/chrisbu/CrimsonHttp
 dependencies:
   unittest:
     sdk: unittest
-  log4dart:
-    git: git://github.com/Solvr/log4dart.git
+  log4dart: ">=1.0.0 <2.0.0"
