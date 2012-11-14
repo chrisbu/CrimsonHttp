@@ -1,8 +1,10 @@
+part of crimson_core;
+
 class StaticFile implements CrimsonEndpoint {
 
   String rootPath;
   Logger logger;
-  
+
   /// Loads the file from the path + the request.uri,
   /// eg: if the [rootPath] is ./public
   /// and the uri is /blah
@@ -14,13 +16,13 @@ class StaticFile implements CrimsonEndpoint {
   StaticFile(String this.rootPath) {
     logger = LoggerFactory.getLogger("StaticFile");
   }
-  
+
   Future<Map> handle(HttpRequest request, HttpResponse response, Map data) {
     Completer completer = new Completer();
     Uri p = new Uri(request.uri);
     String fileToLoad = "${this.rootPath}${p.path}";
     logger.debug("fileToLoad: ${fileToLoad}");
-    
+
     onSuccess(List filedata) {
       logger.debug("Read file: ${fileToLoad}");
       //response.setHeader("Content-Type", "image/x-icon"); //todo - this properly
@@ -29,27 +31,27 @@ class StaticFile implements CrimsonEndpoint {
       response.outputStream.write(filedata);
       completer.complete(data);
     }
-    
+
     onNotFound() {
       //if the file isn't found, but there wasn't another error
       completer.complete(data);
     }
-    
+
     _loadFromPath(fileToLoad, onSuccess, onNotFound, fail(exception) {
       Options o = new Options();
       print(o.script);
       completer.completeException(exception);
     });
-    
+
     return completer.future;
   }
-  
+
   _loadFromPath(String path, success(List data), onNotFound(), fail(exception)) {
-    
+
     logger.debug("_loadFromPath: $path");
 
     File file = new File(path);
-    
+
     //file.fullPath((String fullPath) => print(fullPath));
     file.exists().then((exists) {
       logger.debug("in exists callback: ${path}, ${exists}");
@@ -61,7 +63,7 @@ class StaticFile implements CrimsonEndpoint {
 //      logger.debug("${path} doesn't exist: ${error}");
 //      fail(error);
 //    };
-    
+
     logger.debug("trying to open file: ${path}");
 //    file.exists((bool exists) {
 //      logger.debug("in exists callback: ${path}, ${exists}");
@@ -78,9 +80,9 @@ class StaticFile implements CrimsonEndpoint {
 //      }
 //    });
   }
-  
+
   final String NAME = "StaticFile";
-  
+
   var server;
-  
+
 }
