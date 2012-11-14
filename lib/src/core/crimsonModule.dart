@@ -23,7 +23,7 @@ class CrimsonModule  {
     Iterator handlerIterator = handlers.iterator();
     handleNext() {
       if (data["SUCCESS"] != true) {
-        if (handlerIterator.hasNext()) {
+        if (handlerIterator.hasNext) {
           CrimsonHandler handler = handlerIterator.next();
           print("trying handler: ${handler.NAME}");
           Future<Map> onHandled = handler.handle(req,res,data);

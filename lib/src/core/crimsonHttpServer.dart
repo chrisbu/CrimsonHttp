@@ -43,7 +43,7 @@ class _CrimsonHttpServer implements CrimsonHttpServer {
     logger.debug("${req.method}: ${req.uri}");
 
     CrimsonModule module = null;
-    for (String key in modules.getKeys()) {
+    for (String key in modules.keys) {
       if (key.startsWith(req.path)) {
         module = modules[key];
         break;

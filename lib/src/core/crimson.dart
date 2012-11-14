@@ -44,13 +44,13 @@ part of crimson_core;
 /// and the [filter(CrimsonFilter)] functions - they are included to aid
 /// readability.  You can also use the more generic  more generic
 /// [add(CrimsonHandler)] function.
-interface CrimsonHttpServer default _CrimsonHttpServer {
+abstract class CrimsonHttpServer {
 
   /// Creates the [CrimsonHttpServer].  Takes an optional
   /// [HTTPServer] implementation.
   /// If none is supplied, then it creates it's own internal instance
   /// of [HTTPServer]
-  CrimsonHttpServer([HttpServer httpServer]);
+  factory CrimsonHttpServer([HttpServer httpServer]) => new _CrimsonHttpServer(httpServer);
 
   /// Starts the server listening for requests
   listen(String host, int port);
@@ -82,12 +82,11 @@ interface CrimsonHttpServer default _CrimsonHttpServer {
 
 /// Contains a list of [CrimsonHandler].  Is used by [CrimsonHttpServer] to
 /// contain the list of filters and endpoints
-interface CrimsonHandlerList<E extends CrimsonHandler>
-                   extends Iterable<E>
-                   default _CrimsonHandlerList {
+abstract class CrimsonHandlerList<E extends CrimsonHandler>
+                   extends Iterable<E> {
 
   ///default constructor
-  CrimsonHandlerList(CrimsonHttpServer owner);
+  factory CrimsonHandlerList(CrimsonHttpServer owner) => new _CrimsonHandlerList(owner);
 
   /// Adds a [CrimsonHandler] to the list.
   /// Returns itself to allow for
@@ -104,7 +103,7 @@ interface CrimsonHandlerList<E extends CrimsonHandler>
 }
 
 /// A [CrimsonHandler]
-interface CrimsonHandler {
+abstract class CrimsonHandler {
 
   /// The [name] by which we can identify the handler.  This is used in logging.
   /// It should be set as a constant value in any implementations.
@@ -121,7 +120,7 @@ interface CrimsonHandler {
 /// Filters (which implement [CrimsonFilter]) make use of the request &
 /// response (possibly adding to the request or response),
 /// but don't end the flow.
-interface CrimsonFilter extends CrimsonHandler  {
+abstract class CrimsonFilter extends CrimsonHandler  {
   /// Takes the [request] and [response] from the HTTPServer implementation
   /// and a next function which should be called when the handler has completed
   /// This allows that async handlers can guarentee to have finished
@@ -138,7 +137,7 @@ interface CrimsonFilter extends CrimsonHandler  {
 
 /// Endpoints (which implement [CrimsonEndpoint]) make use of the request &
 /// response, and also end the flow (ie, an endpoint will end the response).
-interface CrimsonEndpoint extends CrimsonHandler {
+abstract class CrimsonEndpoint extends CrimsonHandler {
 /// Takes the [request] and [response] from the HTTPServer implementation
   /// and a next function which should be called when the handler has completed
   /// This allows that async handlers can guarentee to have finished
@@ -169,8 +168,8 @@ class CrimsonHttpException extends HttpException {
   }
 }
 
-interface Session extends Map<String, Object> default SessionImpl {
-  Session();
+abstract class Session extends Map<String, Object> {
+  factory Session() => new SessionImpl();
 
   void addOrReplace(String key, Object value);
 }

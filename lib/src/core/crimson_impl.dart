@@ -42,11 +42,11 @@ class SessionImpl implements Session {
     _internalList.forEach(f);
   }
 
-  Collection getKeys() => _internalList.getKeys();
+  Collection get keys => _internalList.keys;
 
-  Collection getValues() => _internalList.getValues();
+  Collection get values => _internalList.values;
 
   int get length => _internalList.length;
 
-  bool isEmpty() => _internalList.isEmpty();
+  bool get isEmpty => _internalList.isEmpty;
 }

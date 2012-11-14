@@ -21,7 +21,7 @@ class _CrimsonHandlerList<E extends CrimsonHandler> implements CrimsonHandlerLis
   /// Add the handler and return the list to allow method chaining.
   CrimsonHandlerList add(CrimsonHandler handler) {
     if (handler == null) {
-      throw new IllegalArgumentException("[handler] cannot be null");
+      throw new ArgumentError("[handler] cannot be null");
     }
 
     _internalMap[handler.NAME] = handler;
@@ -45,7 +45,7 @@ class _CrimsonHandlerList<E extends CrimsonHandler> implements CrimsonHandlerLis
 //  bool every(bool f(CrimsonHandler)) => _internalList.every(f);
 //  bool some(bool f(CrimsonHandler)) => _internalList.some(f);
 //  bool isEmpty() => _internalList.isEmpty();
-    Iterator iterator() => _internalMap.getValues().iterator();
+    Iterator iterator() => _internalMap.values.iterator();
 //  CrimsonHandler operator[](int i) => _internalList[i];
 //  void operator []=(int index,value) => _internalList[index] = value;
 //  int get length() =>  _internalList.length;
