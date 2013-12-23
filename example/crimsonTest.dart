@@ -34,24 +34,19 @@ Future setTemplateData(HttpRequest req,HttpResponse res,var data) {
   print(data);
   StringBuffer sb = new StringBuffer();
 
-  req.inputStream.onData = () {
+  req.listen((data) {
     print("setTemplateData onData");
-    sb.add(decodeUtf8(req.inputStream.read(req.inputStream.available())));
-  };
-
-  req.inputStream.onClosed = () {
+    req.transform(new Utf8Decoder()).listen((data) { sb.write(data); });
+  }, onDone: (() {
     print("setTemplateData onClose");
     print(sb.toString());
-
-    res.outputStream.writeString(sb.toString());
+    res.write(sb.toString());
     c.complete(null);
-  };
-
-  req.inputStream.onError = (e) {
+  }), onError: ((e) {
     print("setTemplateData onError");
     print("error $e");
     c.complete(null);
-  };
+  }));
 
   return c.future;
 }
